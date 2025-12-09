@@ -1,0 +1,5 @@
+fastapi[standard]
+sqlalchemy
+pandas
+uuid
+psycopg2

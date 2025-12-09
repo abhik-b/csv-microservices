@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projo 1</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .upload-form { margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; }
+        .upload-form form{
+            display: grid; gap: 24px;
+        }
+        .upload-form button{
+            max-width: 25%;
+            padding: 8px 4px;
+            
+        }
+        .task-list { margin-top: 30px; }
+        .task { padding: 10px; margin: 5px 0; border-left: 4px solid #007bff; background: #f8f9fa; }
+        .task.pending { border-color: #ffc107; }
+        .task.processing { border-color: #17a2b8; }
+        .task.completed { border-color: #28a745; }
+        .task.failed { border-color: #dc3545; }
+    </style>
+</head>
+<body>
+    <h1>Projo 1</h1>
+    <div class="upload-form">
+        <form>
+            <div>
+                <label for="file">Select CSV File:</label>
+                <input type="file" id="file" name="file" accept=".csv" required>
+            </div>
+            <div>
+                <label for="task_type">Processing Task:</label>
+                <select id="task_type" name="task_type" required>
+                    <option value="">Select a task...</option>
+                    <option value="clean_duplicates">Remove Duplicates</option>
+                    <option value="validate_data">Validate Data</option>
+                    <option value="calculate_stats">Calculate Statistics</option>
+                    <option value="format_columns">Format Columns</option>
+                </select>
+            </div>
+            <button type="submit">Upload & Process</button>
+        <form>
+    </div>
+    
+</body>
+</html>
