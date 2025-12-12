@@ -1,11 +1,3 @@
-# 1. Fast API setup
-#   a.basic structure ✅
-#   b.Jinja Templates ✅
-#   c.Upload Files    ✅
-# 2. Set up Sqlite    ✅
-# 3. Create Models    ✅
-# 4. Task in DB       ✅
-
 from fastapi import FastAPI, Form, File, UploadFile, Request, Depends
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
@@ -16,7 +8,7 @@ from datetime import datetime
 from models import Task as TaskModel
 from db_models import Task, Base
 from database import get_db, engine
-
+from csv_processor import csv_processing
 
 app = FastAPI(title="Projo 1")
 templates = Jinja2Templates(directory='templates')
@@ -35,13 +27,15 @@ def root():
 
 
 @app.get("/")
-def home(request: Request):
-    return templates.TemplateResponse('home.html', {"request": request})
+def home(request: Request, db: Session = Depends(get_db)):
+    tasks = db.query(Task).order_by(Task.created_at.desc()).all()
+    return templates.TemplateResponse('home.html', {"request": request, "tasks": tasks})
 
 
 @app.get("/tasks")
-def get_tasks():
-    return {"message": "All Tasks"}
+def get_tasks(db: Session = Depends(get_db)):
+    all_tasks = db.query(Task).order_by(Task.created_at.desc()).all()
+    return all_tasks
 
 
 @app.get("/task/{task_id}")
@@ -51,7 +45,7 @@ def get_task_by_id(task_id: int):
 
 @app.post("/upload")
 async def create_task(
-    task_type: str = Form(),
+    task_type: list = Form(),
     csv_file: UploadFile = File(),
     db: Session = Depends(get_db)
 ):
@@ -82,12 +76,10 @@ async def create_task(
     db.add(db_task)
     db.commit()
 
-    # 4. Trigger background processing
-    csv_processing(db_task)
-
     return {"message": "CSV File uploaded", "file_path": file_path, "file_name": saved_file}
 
 
-def csv_processing(task: TaskModel):
-    print(f'Fetching file from {task.file_path}')
-    print(f'{task.task_type} begins for {task.original_filename}')
+@app.get("/processing")
+def get_pending_tasks(db: Session = Depends(get_db)):
+    task = csv_processing(db)
+    return {'task processed': task.id, 'download_link': task.result_path}

@@ -44,6 +44,23 @@
             <button type="submit">Upload & Process</button>
         <form>
     </div>
+
+    <div class="task-list">
+        <ul>
+            {% for task in tasks %}
+                <li>
+                    <div class="task">
+                        <strong>{{task.original_filename}}</strong>
+                        <br>
+                        Task: {{task.task_type}} | 
+                        Status: <span class="status">{{task.status}}</span> 
+                        |ID: {{task.id}}
+                        <br>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
     
 </body>
 </html>
