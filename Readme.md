@@ -15,9 +15,9 @@
 - Mark task as “COMPLETED” or “FAILED” ✅
 - Process the CSV
   - drop duplicates ✅
-  - remove missing rows
-  - calc stats
-  -
+  - remove missing rows ✅
+  - drop columns ✅
+  - fill missing values ✅
 - Write results to task_results table ✅
 
 ### Service 3 Frontend
@@ -25,7 +25,7 @@
 - Given a task_id → return task status + results
 - Tasks are displayed based on filters
 - Build the full “frontend API” users will use later.
-- Task id page is where the task type is created
+- Task id page is where the task type (config) is created
 
 ### Service 2 revisit
 

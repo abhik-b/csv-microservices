@@ -3,6 +3,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 import uuid
 import os
+import json
 import shutil
 from datetime import datetime
 from models import Task as TaskModel
@@ -39,13 +40,14 @@ def get_tasks(db: Session = Depends(get_db)):
 
 
 @app.get("/task/{task_id}")
-def get_task_by_id(task_id: int):
-    return {"message": f"Task Id = {task_id}"}
+async def get_task_by_id(task_id: str, db: Session = Depends(get_db)):
+    task = db.query(Task).filter(
+        Task.id == task_id).order_by(Task.created_at).first()
+    return task
 
 
 @app.post("/upload")
 async def create_task(
-    task_type: list = Form(),
     csv_file: UploadFile = File(),
     db: Session = Depends(get_db)
 ):
@@ -67,7 +69,6 @@ async def create_task(
         id=task_id,
         filename=saved_file,
         original_filename=csv_file.filename,
-        task_type=task_type,
         status="pending",
         file_path=file_path,
         created_at=datetime.utcnow()
@@ -77,6 +78,22 @@ async def create_task(
     db.commit()
 
     return {"message": "CSV File uploaded", "file_path": file_path, "file_name": saved_file}
+
+
+@app.put("/task/{id}")
+async def task_configuration(task_id: str,
+                             config=Form(...),
+                             db: Session = Depends(get_db)
+                             ):
+    task = db.query(Task).filter(
+        Task.id == task_id).order_by(Task.created_at).first()
+    # put task config
+    config_data = json.loads(config)
+    print(config_data)
+    task.config = config_data
+    db.commit()
+    db.refresh(task)
+    return task
 
 
 @app.get("/processing")
