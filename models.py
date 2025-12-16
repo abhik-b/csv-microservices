@@ -13,6 +13,10 @@ class TaskStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
+class ConfigSchema(BaseModel):
+    operations: list
+
+
 class Task(BaseModel):
     id: str
     filename: str

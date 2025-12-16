@@ -1,3 +1,9 @@
+## Phase 1
+
+- Build the core services
+- write some tests
+- make some diagrams
+
 ### Service 1 Fast API Backend
 
 - 1. Fast API setup ✅
@@ -22,14 +28,38 @@
 
 ### Service 3 Frontend
 
-- Given a task_id → return task status + results
-- Tasks are displayed based on filters
+- Given a task_id → return task status + results ✅
+- Task configuration gets uploaded from frontend ✅
 - Build the full “frontend API” users will use later.
-- Task id page is where the task type (config) is created
+  - Task id page is where the task type (config) is created ✅
+  - Tasks are displayed based on filters (admin page) ✅
+  - File Upload page & redirect to Task id page ✅
 
-### Service 2 revisit
+### Tests
 
+- CSV Processing Logic
+
+  - duplicates are removed
+  - missing rows are dropped
+  - columns are dropped correctly
+  - fillna works as expected
+
+- Task Lifecycle Tests (DB + Logic)
+  - Task starts as PENDING
+  - Task moves to PROCESSING
+  - Task moves to COMPLETED
+  - Task moves to FAILED on exception
+
+## Phase 2
+
+- handle the processing part
 - add schedulers
+
+## Phase 3
+
+- polish the project
+- prepare for interview
+- prepare a actual readme
 
 ### Polishing
 
@@ -39,3 +69,23 @@
 - datetime.utcnow replace
 - proper task service
 - add loggers
+- admin page tab style ui
+- admin page startup show all tasks
+
+ <!-- <div class="task-list">
+        <ul class="flex flex-col items-start gap-2.5">
+            {% for task in tasks %}
+                <li class="bg-gray-50 w-[660px]">
+                    <div class="flex flex-col w-full  leading-1.5 p-4 bg-neutral-secondary-soft rounded-e-base rounded-es-base">
+                        <div class="flex items-center justify-between
+                                    space-x-1.5 rtl:space-x-reverse w-full">
+                            <span class="text-sm font-semibold text-heading">{{task.filename}}</span>
+                            <span class="text-sm text-body">{{task.status}}</span>
+                        </div>
+                        <p class="text-sm text-body">Uploaded at : {{task.created_at.strftime('%d-%m-%Y -- %H:%M:%S')}}</p>
+                        <p class="text-sm text-body">Started Processing at : {{task.started_at.strftime('%d-%m-%Y -- %H:%M:%S')}}</p>
+                        <p class="text-sm text-body"> Completed Processing at : {{task.completed_at.strftime('%d-%m-%Y -- %H:%M:%S')}}</p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul> -->

@@ -3,64 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <title>Projo 1</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; }
-        .upload-form { margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; }
-        .upload-form form{
-            display: grid; gap: 24px;
-        }
-        .upload-form button{
-            max-width: 25%;
-            padding: 8px 4px;
-            
-        }
-        .task-list { margin-top: 30px; }
-        .task { padding: 10px; margin: 5px 0; border-left: 4px solid #007bff; background: #f8f9fa; }
-        .task.pending { border-color: #ffc107; }
-        .task.processing { border-color: #17a2b8; }
-        .task.completed { border-color: #28a745; }
-        .task.failed { border-color: #dc3545; }
     </style>
 </head>
 <body>
-    <h1>Projo 1</h1>
+    <h1>Admin</h1>
     <div class="upload-form">
-        <form>
-            <div>
-                <label for="file">Select CSV File:</label>
-                <input type="file" id="file" name="file" accept=".csv" required>
-            </div>
-            <div>
-                <label for="task_type">Processing Task:</label>
-                <select id="task_type" name="task_type" required>
-                    <option value="">Select a task...</option>
-                    <option value="clean_duplicates">Remove Duplicates</option>
-                    <option value="validate_data">Validate Data</option>
-                    <option value="calculate_stats">Calculate Statistics</option>
-                    <option value="format_columns">Format Columns</option>
-                </select>
-            </div>
-            <button type="submit">Upload & Process</button>
-        <form>
-    </div>
-
-    <div class="task-list">
-        <ul>
-            {% for task in tasks %}
-                <li>
-                    <div class="task">
-                        <strong>{{task.original_filename}}</strong>
-                        <br>
-                        Task: {{task.task_type}} | 
-                        Status: <span class="status">{{task.status}}</span> 
-                        |ID: {{task.id}}
-                        <br>
+        <form class="bg-gray-800 text-white">  
+            <div class="flex items-center justify-center w-full">
+                <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-64 bg-neutral-secondary-medium border border-dashed border-default-strong rounded-base cursor-pointer hover:bg-neutral-tertiary-medium">
+                    <div class="flex flex-col items-center justify-center text-body pt-5 pb-6">
+                        <svg class="w-8 h-8 mb-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h3a3 3 0 0 0 0-6h-.025a5.56 5.56 0 0 0 .025-.5A5.5 5.5 0 0 0 7.207 9.021C7.137 9.017 7.071 9 7 9a4 4 0 1 0 0 8h2.167M12 19v-9m0 0-2 2m2-2 2 2"/></svg>
+                        <p class="mb-2 text-sm"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                        <p class="text-xs">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
                     </div>
-                </li>
-            {% endfor %}
-        </ul>
+                    <input id="dropzone-file" type="file" class="hidden" />
+                </label>
+            </div> 
+
+
+        <form>
     </div>
+    <script>
+
+// 1. Select the file input element by its ID
+const fileInput = document.getElementById('dropzone-file');
+
+// 2. Add an event listener to detect when a file is selected
+fileInput.addEventListener('change', async (event) => {
+    const file = event.target.files[0]; // Get the first selected file
+    if (!file) return;
+
+    // 3. Prepare the data using FormData
+    const formData = new FormData();
+    formData.append('csv_file', file); // 'file' is the key your server will look for
+
+    try {
+        // 4. Send the POST request
+        const response = await fetch('/upload', {
+            method: 'POST',
+            body: formData,
+            // Note: Do NOT set 'Content-Type' header; 
+            // the browser sets it automatically with the correct boundary
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            console.log('Upload successful:', result);
+            showToast("Upload successful! Redirecting...");
+            if (result.taskID) {
+                setTimeout(()=>{
+                    window.location.href = `/tasks/${result.taskID}`;
+                },2000)
+            }
+        } else {
+            console.error('Upload failed:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error during upload:', error);
+    }
+});
+
+function showToast(message) {
+    const toast = document.createElement('div');
     
+    // Styling the toast with Tailwind classes
+    toast.className = "fixed bottom-5 right-5 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-500";
+    toast.innerText = message;
+
+    document.body.appendChild(toast);
+
+    // Optional: Fade out effect just before redirect
+    setTimeout(() => {
+        toast.style.opacity = '0';
+    }, 1500);
+}
+    </script>
+
 </body>
 </html>

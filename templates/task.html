@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Projo 1</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .upload-form { margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; }
+        .upload-form form{
+            display: grid; gap: 24px;
+        }
+        .upload-form button{
+            max-width: 25%;
+            padding: 8px 4px;
+            
+        }
+        .task-list { margin-top: 30px; }
+        .task { padding: 10px; margin: 5px 0; border-left: 4px solid #007bff; background: #f8f9fa; }
+        .task.pending { border-color: #ffc107; }
+        .task.processing { border-color: #17a2b8; }
+        .task.completed { border-color: #28a745; }
+        .task.failed { border-color: #dc3545; }
+    </style>
+</head>
+<body>
+<div class="relative isolate overflow-hidden bg-gray-900 py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl lg:mx-0">
+      <h2 class="text-2xl font-semibold tracking-tight text-white sm:text-7xl">{{task.original_filename}}</h2>
+      <p class="mt-8 text-lg font-medium text-pretty text-gray-300 sm:text-xl/8"> Task ID : <span id="task-id">{{task.id}}</span></p>
+    </div>
+    <div class="mx-auto mt-4 max-w-2xl lg:mx-0 lg:max-w-none">
+      <div class="grid grid-cols-1 gap-x-8 gap-y-6 text-base/7  text-gray-500 sm:grid-cols-2 md:flex lg:gap-x-10 items-center">
+        <a href="#"> Uploaded at : {{task.created_at}} </a>
+        <a href="#">Task Status : {{task.status}} </a>
+        <a href="#">Task Progress : {{task.progress}} </a>
+        {% if task.status=="completed" %}
+        <a href="/tasks/{{ task.id }}/download"
+        class="bg-white text-black font-medium rounded-base text-sm px-4 py-2.5 text-center leading-5"
+        >
+        Download Result CSV
+    </a>
+    {% endif %}
+        
+      </div>
+    </div>
+    <h3 class="mt-6 max-w-2xl lg:mx-0 lg:max-w-none text-xl text-white font-medium"> Preview :</h3>
+        <div class="overflow-x-auto border rounded-lg  mt-4
+                    [&_table]:w-full [&_table]:text-sm [&_table]:text-center 
+                    [&_th]:bg-gray-50 [&_th]:py-3 [&_th]:border-b [&_th]:text-center [&_th]:font-semibold [&_td]:text-white
+                    [&_td]:py-3 [&_td]:border-b [&_tr:hover]:bg-blue-50">
+            {{ preview_html | safe }}
+        </div>
+  </div>
+
+
+
+    <div class="task-config-form mx-auto max-w-7xl px-6 lg:px-8 text-white">
+        <form class="p-8">
+            <div>
+                <fieldset>
+                    <legend class="text-2xl font-semibold">Choose your tasks:</legend>
+                    <div class="my-4 flex flex-col gap-y-4">
+                    <div>
+                        <input type="checkbox" id="drop_columns" name="interest" value="drop_columns" class="w-4 h-4 border border-default-medium rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft">
+                        <label for="drop_columns">Drop Columns</label>
+                        <div class="hidden-div hidden mx-4 px-4">
+                            <label for="dropcolumn_columns">Mention the columns
+                                (with comma) :
+                            </label>
+                            <input class="border ml-4 p-2 rounded-lg " type="text" id="dropcolumn_columns" name="dropcolumn_columns"><br>
+                        </div>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="remove_duplicates" name="interest" value="remove_duplicates" class="w-4 h-4 border border-default-medium rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft">
+                        <label for="remove_duplicates">Remove Duplicates</label>
+                        <div class="hidden-div hidden mx-4 px-4">
+                            <label for="rmduplicates_columns">Mention the columns
+                                (with comma) :
+                            </label>
+                            <input class="border ml-4 p-2 rounded-lg " type="text" id="rmduplicates_columns" name="rmduplicates_columns"><br>
+                        </div>
+                    </div>
+                    <div>
+                    <input type="checkbox" id="remove_missing_rows" name="interest" value="remove_missing_rows" class="w-4 h-4 border border-default-medium rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft">
+                    <label for="remove_missing_rows">Remove rows with missing values</label>
+                    <div class="hidden-div hidden mx-4 px-4">
+                        <label for="rmmissingrows_columns">Mention the columns
+                             (with comma) :
+                        </label>
+                        <input class="border ml-4 p-2 rounded-lg " type="text" id="rmmissingrows_columns" name="rmmissingrows_columns"><br>
+                    </div>
+                    </div>
+                    <div>
+                    <input type="checkbox" id="fill_missing" name="interest" value="fill_missing" class="w-4 h-4 border border-default-medium rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft">
+                    <label for="fill_missing">Fill missing values</label>
+                    <div class="hidden-div hidden mx-4 px-4">
+                        <label for="fill_missing_columns">Mention the column & the fill value:
+                        </label>
+                        <input class="border ml-4 p-2 rounded-lg " type="text" id="fill_missing_columns" name="fill_missing_columns"><br>
+                        <span class="text-gray-500 text-sm">country:Unknown,industry:none</span>
+                    </div>
+                    </div>
+                </div>
+                </fieldset>
+            </div>
+            <button class="text-white bg-purple-500 font-medium rounded-base text-sm px-4 py-2.5 text-center leading-5 mx-auto mt-4" type="submit">Process</button>
+        <form>
+    </div>
+
+</div>
+
+
+
+    <!-- <div class="task">
+        <strong>{{task.original_filename}}</strong>
+        <br>
+        Task:
+                        <pre>
+                            {{task.config}}
+                        </pre>
+        Status: <span class="status">{{task.status}}</span> 
+        <br>
+        ID: {{task.id}}
+        <br>
+        <a href="/tasks/{{ task.id }}/download">
+        Download Result CSV
+    </a>
+    </div> -->
+        
+    <script>
+        document.addEventListener('change', function(event) {
+            // Only proceed if the changed element is one of your interest checkboxes
+            if (event.target.name === 'interest') {
+                const checkbox = event.target;
+                // Find the specific hidden div associated with this checkbox
+                // In your HTML structure, it is the next sibling div
+                const hiddenDiv = checkbox.parentElement.querySelector('.hidden-div') || 
+                                checkbox.closest('div').querySelector('.hidden');
+                
+                if (hiddenDiv) {
+                    if (checkbox.checked) {
+                        hiddenDiv.classList.remove('hidden');
+                    } else {
+                        hiddenDiv.classList.add('hidden');
+                    }
+                }
+            }
+        });
+
+        const form = document.querySelector('form');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // 1. Get all checked interest checkboxes
+            const selectedInterests = form.querySelectorAll('input[name="interest"]:checked');
+            
+            // 2. Map through them to build a structured object
+            const taskConfig = Array.from(selectedInterests).map(checkbox => {
+                const value = checkbox.value;
+                
+                // Find the input field within the same parent container
+                const parentContainer = checkbox.closest('div');
+                const textInput = parentContainer.querySelector('input[type="text"]');
+                if(value=="drop_columns"){
+                    dict_entry={
+                        op: value,
+                        params: textInput ? {"columns":textInput.value.split(',')} : null
+                    }
+                }
+                else if(value=="fill_missing"){
+                    columns=textInput.value.split(',')
+                    columns_remapped=columns.map(dt=>{
+                        const [col,val]=dt.split(':')
+                        return {[col]:val}
+                    })
+                    dict_entry={
+                        op: value,
+                        params: textInput ? {"columns":columns_remapped,"method":"constant"} : null
+                    }
+                }
+                else{
+                   dict_entry={
+                        op: value,
+                        params: textInput ? {"subset":textInput.value.split(',')} : null
+                    } 
+                }
+                
+                return dict_entry;
+            });
+
+            console.log('Final Task Configuration:', taskConfig);
+            const taskID=document.getElementById('task-id').innerText
+            console.log(JSON.stringify({ "operations": taskConfig }))
+            console.log(JSON.stringify(JSON.stringify({ "operations": taskConfig })) )
+            try {
+                const response = await fetch(`/task/${taskID}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ "operations": taskConfig }) 
+                });
+                console.log(response)
+                
+            } catch (error) {
+               console.error(error) 
+            }
+        });
+
+    </script>
+    
+</body>
+</html>
