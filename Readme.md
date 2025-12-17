@@ -39,10 +39,10 @@
 
 - CSV Processing Logic
 
-  - duplicates are removed
-  - missing rows are dropped
-  - columns are dropped correctly
-  - fillna works as expected
+  - duplicates are removed ✅
+  - missing rows are dropped ✅
+  - columns are dropped correctly ✅
+  - fillna works as expected ✅
 
 - Task Lifecycle Tests (DB + Logic)
   - Task starts as PENDING

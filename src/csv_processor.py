@@ -1,5 +1,5 @@
-from models import Task as TaskModel
-from db_models import Task
+# from models import Task as TaskModel
+from .db_models import Task
 from sqlalchemy.orm import Session  # type: ignore
 from datetime import datetime
 import time
@@ -57,36 +57,9 @@ OP_REGISTRY = {
     "fill_missing": fill_missing,
     # add more here...
 }
-# def csv_processing(db: Session):
-#     task = db.query(Task).filter(Task.status == "pending").first()
-#     print(f'Fetching file from {task.file_path}')
-#     task.status = "processing"
-#     task.started_at = datetime.utcnow()
-#     df = pd.read_csv(task.file_path)
-#     try:
-#         for task_type in task.task_type:
-#             match task_type:
-#                 case "remove_duplicates":
-#                     print(f'Removing Duplicates')
-#                     df, output_path = remove_duplicates(
-#                         df, task.original_filename)
-#                     task.result_path = output_path
-#                 case "remove_missing_rows":
-#                     print(f'Removing Rows with missing values')
-#                     df, output_path = remove_missing_rows(
-#                         task.file_path, task.original_filename)
-#                     task.result_path = output_path
-#         task.completed_at = datetime.utcnow()
-#         task.status = "completed"
-#     except:
-#         task.status = "failed"
-#     finally:
-#         db.commit()
-#     return task
 
 
 def csv_processing(db: Session):
-    # Atomically fetch the next pending task (simple approach)
     task: Task = db.query(Task).filter(
         Task.status == "pending").order_by(Task.created_at).first()
     if not task:
@@ -95,25 +68,20 @@ def csv_processing(db: Session):
     task.status = "processing"
     task.started_at = datetime.utcnow()
     task.progress = 0
-    db.commit()  # persist started state
+    db.commit()
 
     try:
         input_path = task.file_path
         print(f"Processing task {task.id} input={input_path}")
 
-        # Read CSV - infer dtypes; consider reading chunked for large files.
         df = pd.read_csv(input_path)
 
-        # load operations from config
         ops = []
 
         if task.config and isinstance(task.config, dict):
             ops = task.config.get("operations", [])
         else:
-            # Backwards compat: maybe task.task_type existed as list of strings
-            # but we removed it. If you kept it, handle here.
             ops = []
-            print("isinstance(task.config, dict) failed")
 
         total_ops = max(1, len(ops))
         completed_ops = 0

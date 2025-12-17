@@ -1,6 +1,7 @@
-from sqlalchemy.ext.declarative import declarative_base
+# from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Text, String, DateTime
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import declarative_base
 import uuid
 from datetime import datetime
 
@@ -14,15 +15,6 @@ class Task(Base):
     filename = Column(String)
     original_filename = Column(String)
     file_path = Column(String)
-
-    # New: config contains ordered list of operations (JSONB)
-    # Example:
-    # {
-    #   "operations": [
-    #       {"op": "drop_columns", "params": {"columns": ["x","y"]}},
-    #       {"op": "remove_duplicates", "params": {"subset": ["id"]}}
-    #   ]
-    # }
 
     config = Column(JSONB, nullable=True)
     status = Column(String)  # pending, processing, completed, failed
