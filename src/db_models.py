@@ -20,7 +20,7 @@ class Task(Base):
     status = Column(String)  # pending, processing, completed, failed
     progress = Column(String, nullable=True)
 
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now())
     started_at = Column(DateTime, nullable=True)
     completed_at = Column(DateTime, nullable=True)
 

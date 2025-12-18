@@ -44,11 +44,7 @@
   - columns are dropped correctly ✅
   - fillna works as expected ✅
 
-- Task Lifecycle Tests (DB + Logic)
-  - Task starts as PENDING
-  - Task moves to PROCESSING
-  - Task moves to COMPLETED
-  - Task moves to FAILED on exception
+- Task Lifecycle Tests (DB + Logic) ✅
 
 ## Phase 2
 
@@ -69,6 +65,7 @@
 - datetime.utcnow replace
 - proper task service
 - add loggers
+- Test the API
 - admin page tab style ui
 - admin page startup show all tasks
 
