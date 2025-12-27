@@ -1,5 +1,5 @@
 # from models import Task as TaskModel
-from .db_models import Task
+from src.shared.db_models import Task
 from sqlalchemy.orm import Session  # type: ignore
 from datetime import datetime
 import time

@@ -7,10 +7,10 @@ import os
 import json
 import shutil
 from datetime import datetime
-from src.models import ConfigSchema
-from src.db_models import Task, Base
-from src.database import get_db, engine
-from src.csv_processor import csv_processing
+from src.app.models import ConfigSchema
+from src.shared.db_models import Task, Base
+from src.app.database import get_db, engine
+from src.app.csv_processor import csv_processing
 import pandas as pd
 from fastapi.responses import FileResponse
 

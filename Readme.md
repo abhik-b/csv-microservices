@@ -1,7 +1,7 @@
 ## Phase 1
 
-- Build the core services
-- write some tests
+- Build the core services ✅
+- write some tests ✅
 - make some diagrams
 
 ### Service 1 Fast API Backend

@@ -3,7 +3,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 
-db_url = "postgresql://postgres:admin@localhost:5432/csv-processin"
+# db_url = "postgresql://postgres:admin@localhost:5432/csv-processin"
+db_url = "postgresql://postgres:admin@host.docker.internal:5432/csv-processin"
 engine = create_engine(db_url)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
