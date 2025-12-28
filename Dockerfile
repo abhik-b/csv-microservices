@@ -25,8 +25,11 @@ RUN pip install --no-cache-dir --upgrade pip && \
 #7 Copy application code
 COPY . .
 
-RUN mkdir -p uploads outputs
+RUN mkdir -p /app/uploads /app/output
 
 #8 Expose port & run fastapi
 EXPOSE 8000
 CMD ["uvicorn", "src.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# Below does not work
+# CMD ["fastapi", "run", "src/app/main.py", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,0 +1,55 @@
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: csv_processin
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d csv_processin"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:admin@db:5432/csv_processin
+      PYTHONPATH: /app
+      WATCHFILES_FORCE_POLLING: "true" 
+    ports:
+      - "8000:8000"
+    volumes:
+      # These MUST exist as folders on your computer for persistence to work
+      - ./uploads:/app/uploads
+      - ./output:/app/output
+      # Source code mounts for standard backup
+      - ./src:/app/src
+      - ./templates:/app/templates
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+        - action: sync
+          path: ./templates
+          target: /app/templates
+        - action: rebuild
+          path: requirements.txt
+    # Added --reload-dir to focus uvicorn on the right spot
+    command: uvicorn src.app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/src
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      
+volumes:
+  postgres_data:

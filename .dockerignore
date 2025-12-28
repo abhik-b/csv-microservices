@@ -1,38 +1,15 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
+.git
+__pycache__
+*.pyc
+*.pyo
+*.pyd
 .Python
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Logs
-*.log
-logs/
-
-# Test
-.coverage
-htmlcov/
-.pytest_cache/
-
-# Environment
-.env
-.env.local
-.env.*.local
-
-# Docker
-docker-compose.override.yml
-
-# OS
+env
+venv
+.venv
+*.sqlite3
 .DS_Store
-Thumbs.db
+*.log
+uploads/*
+outputs/*
+test*

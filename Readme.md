@@ -48,8 +48,20 @@
 
 ## Phase 2
 
+- add docker ✅
+- add docker compose
 - handle the processing part
 - add schedulers
+
+### Docker
+
+- prepare a dockerfile ✅
+- build docker image ✅
+- run docker image ✅
+- add docker compose yaml ✅
+- docker compose working ✅
+
+### Celery
 
 ## Phase 3
 
@@ -69,20 +81,29 @@
 - admin page tab style ui
 - admin page startup show all tasks
 
- <!-- <div class="task-list">
-        <ul class="flex flex-col items-start gap-2.5">
-            {% for task in tasks %}
-                <li class="bg-gray-50 w-[660px]">
-                    <div class="flex flex-col w-full  leading-1.5 p-4 bg-neutral-secondary-soft rounded-e-base rounded-es-base">
-                        <div class="flex items-center justify-between
-                                    space-x-1.5 rtl:space-x-reverse w-full">
-                            <span class="text-sm font-semibold text-heading">{{task.filename}}</span>
-                            <span class="text-sm text-body">{{task.status}}</span>
-                        </div>
-                        <p class="text-sm text-body">Uploaded at : {{task.created_at.strftime('%d-%m-%Y -- %H:%M:%S')}}</p>
-                        <p class="text-sm text-body">Started Processing at : {{task.started_at.strftime('%d-%m-%Y -- %H:%M:%S')}}</p>
-                        <p class="text-sm text-body"> Completed Processing at : {{task.completed_at.strftime('%d-%m-%Y -- %H:%M:%S')}}</p>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul> -->
+## Acknowledgements
+
+1. Thanks to this article on ([setting up pgadmin with docker](https://www.geeksforgeeks.org/postgresql/run-postgresql-on-docker-and-setting-up-pgadmin/))
+2. this command shows the table
+
+```bash
+docker exec -it csv-micro-db-1 psql -U postgres -d csv_processin -c "SELECT * FROM tasks LIMIT 5;"
+```
+
+<!-- <div class="task-list">
+       <ul class="flex flex-col items-start gap-2.5">
+           {% for task in tasks %}
+               <li class="bg-gray-50 w-[660px]">
+                   <div class="flex flex-col w-full  leading-1.5 p-4 bg-neutral-secondary-soft rounded-e-base rounded-es-base">
+                       <div class="flex items-center justify-between
+                                   space-x-1.5 rtl:space-x-reverse w-full">
+                           <span class="text-sm font-semibold text-heading">{{task.filename}}</span>
+                           <span class="text-sm text-body">{{task.status}}</span>
+                       </div>
+                       <p class="text-sm text-body">Uploaded at : {{task.created_at.strftime('%d-%m-%Y -- %H:%M:%S')}}</p>
+                       <p class="text-sm text-body">Started Processing at : {{task.started_at.strftime('%d-%m-%Y -- %H:%M:%S')}}</p>
+                       <p class="text-sm text-body"> Completed Processing at : {{task.completed_at.strftime('%d-%m-%Y -- %H:%M:%S')}}</p>
+                   </div>
+               </li>
+           {% endfor %}
+       </ul> -->

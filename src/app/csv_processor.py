@@ -2,14 +2,13 @@
 from src.shared.db_models import Task
 from sqlalchemy.orm import Session  # type: ignore
 from datetime import datetime
-import time
 import pandas as pd  # type: ignore
 import os
 import traceback
 
 
 def remove_duplicates(df, params):
-    subset = params.get("subset")  # list or None
+    subset = params.get("subset")
     keep = params.get("keep", "first")
     print("subset ", subset)
     print("keep ", keep)
@@ -19,15 +18,15 @@ def remove_duplicates(df, params):
 
 
 def remove_missing_rows(df, params):
-    subset = params.get("subset")  # columns to consider, or None -> any
-    how = params.get("how", "any")  # 'any' or 'all'
+    subset = params.get("subset")
+    how = params.get("how", "any")
     df = df.dropna(subset=subset, how=how)
     print("removed rows with missing values")
     return df
 
 
 def drop_columns(df, params):
-    columns = params.get("columns")  # list or None
+    columns = params.get("columns")
     print("columns ", columns)
     if columns:
         df = df.drop(
@@ -55,7 +54,7 @@ OP_REGISTRY = {
     "remove_missing_rows": remove_missing_rows,
     "drop_columns": drop_columns,
     "fill_missing": fill_missing,
-    # add more here...
+    # add more later...
 }
 
 
@@ -100,11 +99,10 @@ def csv_processing(db: Session):
             print("flag 3")
             df = handler(df, params)
 
-            # update progress heuristically
             completed_ops += 1
             task.progress = int((completed_ops / total_ops) * 100)
             db.commit()
-    # write CSV once at the end
+
         output_path = os.path.join(
             'output', f"processed-{task.original_filename}")
         df.to_csv(output_path, index=False)
@@ -119,6 +117,6 @@ def csv_processing(db: Session):
         print("Error processing task:", e)
         task.status = "failed"
         task.error_message = f"{str(e)}\n\n{tb}"
-        task.completed_at = datetime.utcnow()
+        task.completed_at = datetime.now()
         db.commit()
     return task
