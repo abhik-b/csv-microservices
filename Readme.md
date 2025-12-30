@@ -49,7 +49,7 @@
 ## Phase 2
 
 - add docker ✅
-- add docker compose
+- add docker compose ✅
 - handle the processing part
 - add schedulers
 
@@ -60,6 +60,18 @@
 - run docker image ✅
 - add docker compose yaml ✅
 - docker compose working ✅
+
+### Logs & healthchecks
+
+- Healthcheck ✅
+<!-- - Loguru ✅ -->
+
+```bash
+docker compose up --watch
+docker compose down
+
+docker exec -it csv-micro-db-1 psql -U postgres -d csv_processin -c "SELECT * FROM tasks LIMIT 5;"
+```
 
 ### Celery
 

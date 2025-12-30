@@ -30,9 +30,9 @@ services:
       # These MUST exist as folders on your computer for persistence to work
       - ./uploads:/app/uploads
       - ./output:/app/output
-      # Source code mounts for standard backup
       - ./src:/app/src
       - ./templates:/app/templates
+      - ./logs:/app/logs
     develop:
       watch:
         - action: sync
@@ -46,10 +46,13 @@ services:
     # Added --reload-dir to focus uvicorn on the right spot
     command: uvicorn src.app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/src
     healthcheck:
+      # Docker will run this command to verify the status from the endpoint you wrote
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 10s  # Grace period for the app to start up
       
 volumes:
   postgres_data:
+  

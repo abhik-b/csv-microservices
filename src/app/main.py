@@ -1,10 +1,11 @@
-from fastapi import FastAPI, Form, File, UploadFile, Request, Depends, Body
+from fastapi import FastAPI, Form, File, UploadFile, Request, Depends, HTTPException
 from fastapi.templating import Jinja2Templates
 from typing import Optional
 from sqlalchemy.orm import Session
 import uuid
 import os
 import shutil
+from sqlalchemy import text
 from datetime import datetime
 from src.app.models import ConfigSchema
 from src.shared.db_models import Task, Base
@@ -12,24 +13,80 @@ from src.app.database import get_db, engine
 from src.app.csv_processor import csv_processing
 import pandas as pd
 from fastapi.responses import FileResponse
+from loguru import logger
+import sys
+from pathlib import Path
 
 from fastapi.encoders import jsonable_encoder
-
+# PROJECT_ROOT = Path(__file__).resolve().parents[0]
+# LOG_DIR = PROJECT_ROOT / "logs"
 
 app = FastAPI(title="Projo 1")
 templates = Jinja2Templates(directory='templates')
+logger.remove()
+logger.add(
+    sys.stderr, format="{time:MMMM D, YYYY > HH:mm:ss} • {level} • {message}")
+logger.add(
+    Path("/app/logs/app.log"),
+    rotation="500 MB",
+    retention="10 days",
+    compression="zip",
+    level="DEBUG",
+    enqueue=True
+)
 
 
 @app.on_event("startup")
 def on_startup():
     # Creates all tables if they don't exist
     Base.metadata.create_all(bind=engine)
-    print("Database tables created (if they didn't exist).")
+    logger.info("Database tables created (if they didn't exist).")
 
 
 @app.get("/health")
-def root():
-    return {"message": "CSV Processor is online"}
+def health_check(db: Session = Depends(get_db)):
+    health_status = {
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "service": "csv-processor",
+        "version": "1.0.0",
+        "checks": {}
+    }
+
+    # 1. Check Database Connection
+    try:
+        # Use text() for SQLAlchemy 2.0+ compatibility
+        db.execute(text("SELECT 1"))
+        health_status["checks"]["database"] = "up"
+    except Exception as e:
+        health_status["status"] = "unhealthy"
+        health_status["checks"]["database"] = f"down: {str(e)}"
+
+    # 2. Check Disk Space for Uploads
+    uploads_dir = "uploads"
+    if os.path.exists(uploads_dir):
+        # returns named tuple: total, used, free (in bytes)
+        usage = shutil.disk_usage(uploads_dir)
+
+        # Convert bytes to Gigabytes for readability
+        gb_factor = 1024**3
+        health_status["checks"]["disk_space"] = {
+            "total_gb": round(usage.total / gb_factor, 2),
+            "used_gb": round(usage.used / gb_factor, 2),
+            "free_gb": round(usage.free / gb_factor, 2),
+            "percent_used": round((usage.used / usage.total) * 100, 2)
+        }
+
+        # Optional: Set status to unhealthy if disk is > 95% full
+        if (usage.used / usage.total) > 0.95:
+            health_status["status"] = "degraded"
+    else:
+        health_status["checks"]["disk_space"] = "directory_not_found"
+
+    if health_status["status"] == "unhealthy":
+        raise HTTPException(status_code=503, detail=health_status)
+
+    return health_status
 
 
 @app.get("/admin")
@@ -55,10 +112,11 @@ def all_tasks(request: Request, db: Session = Depends(get_db)):
 
 
 @app.get("/tasks/{task_id}")
-def get_task(task_id: str, request: Request, db: Session = Depends(get_db)):
+def get_task_page(task_id: str, request: Request, db: Session = Depends(get_db)):
     task = db.query(Task).filter(
         Task.id == task_id).order_by(Task.created_at).first()
     df = pd.read_csv(task.file_path)
+    logger.info("csv read successfully")
     preview_html = df.head().to_html(classes='table table-striped', index=False)
     return templates.TemplateResponse('task.html', {"request": request, "task": task, "preview_html": preview_html})
 
@@ -84,6 +142,7 @@ async def create_task(
     task_id = str(uuid.uuid4())
     saved_file = f"{task_id}.csv"
     file_path = os.path.join('uploads', saved_file)
+    logger.info(f"File Uploaded successfully : {file_path}")
 
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(csv_file.file, buffer)
@@ -100,6 +159,7 @@ async def create_task(
 
     db.add(db_task)
     db.commit()
+    logger.info(f"Task  created successfully;  Task ID: {task_id}")
 
     return {"message": "CSV File uploaded", "taskID": task_id}
 
@@ -112,10 +172,9 @@ async def task_configuration(task_id: str,
     print(config)
     task = db.query(Task).filter(
         Task.id == task_id).order_by(Task.created_at).first()
-    # config_data = json.loads(config)
-    # print(config_data)
-    # task.config = config_data
+
     task.config = config.model_dump()
+    logger.info(f"Config for Task {task_id} updated successfully")
     db.commit()
     db.refresh(task)
     return jsonable_encoder(task)
@@ -130,7 +189,7 @@ def get_pending_tasks(db: Session = Depends(get_db)):
 @app.get("/tasks/{task_id}/download")
 def download_task_result(task_id: str, db: Session = Depends(get_db)):
     task = db.query(Task).filter(Task.id == task_id).first()
-    print('download called')
+    logger.info('download called')
     return FileResponse(
         path=task.result_path,
         media_type="text/csv",
