@@ -1,1 +1,24 @@
 2025-12-30 03:39:35.636 | INFO     | src.app.main:on_startup:43 - Database tables created (if they didn't exist).
+2025-12-31 02:46:01.642 | INFO     | src.app.main:on_startup:44 - Database tables created (if they didn't exist).
+2025-12-31 02:46:18.634 | INFO     | src.app.main:get_task_page:120 - csv read successfully
+2025-12-31 02:47:14.003 | INFO     | src.app.main:create_task:146 - File Uploaded successfully : uploads/2b9181e1-6783-4da7-9045-b54f83f1e777.csv
+2025-12-31 02:47:14.075 | INFO     | src.app.main:create_task:163 - Task  created successfully;  Task ID: 2b9181e1-6783-4da7-9045-b54f83f1e777
+2025-12-31 02:47:18.305 | INFO     | src.app.main:get_task_page:120 - csv read successfully
+2025-12-31 02:48:55.657 | INFO     | src.app.main:get_task_page:120 - csv read successfully
+2025-12-31 02:52:00.053 | INFO     | src.app.main:task_configuration:185 - Config for Task 2b9181e1-6783-4da7-9045-b54f83f1e777 updated successfully
+2025-12-31 02:52:00.123 | INFO     | src.app.main:task_configuration:193 - Task 2b9181e1-6783-4da7-9045-b54f83f1e777 sent to Celery queue. Task ID: f73d6ec8-cae5-4519-a77b-6378d870c7ca
+2025-12-31 02:52:57.835 | INFO     | src.app.main:create_task:146 - File Uploaded successfully : uploads/9b0e6916-2d7c-49cc-8fb3-611e51c8227e.csv
+2025-12-31 02:52:57.842 | INFO     | src.app.main:create_task:163 - Task  created successfully;  Task ID: 9b0e6916-2d7c-49cc-8fb3-611e51c8227e
+2025-12-31 02:52:59.866 | INFO     | src.app.main:get_task_page:120 - csv read successfully
+2025-12-31 02:53:08.267 | INFO     | src.app.main:task_configuration:185 - Config for Task 9b0e6916-2d7c-49cc-8fb3-611e51c8227e updated successfully
+2025-12-31 02:53:08.273 | INFO     | src.app.main:task_configuration:193 - Task 9b0e6916-2d7c-49cc-8fb3-611e51c8227e sent to Celery queue. Task ID: d08cf116-8e3e-4366-9ef8-c6381de36333
+2025-12-31 02:54:08.408 | INFO     | src.app.main:get_task_page:120 - csv read successfully
+2025-12-31 02:54:10.674 | INFO     | src.app.main:get_task_page:120 - csv read successfully
+2025-12-31 02:56:51.182 | INFO     | src.app.main:download_task_result:224 - download called
+2025-12-31 04:16:42.625 | INFO     | src.app.main:on_startup:44 - Database tables created (if they didn't exist).
+2025-12-31 04:38:10.726 | INFO     | src.app.main:on_startup:44 - Database tables created (if they didn't exist).
+2025-12-31 04:38:29.204 | INFO     | src.app.main:on_startup:44 - Database tables created (if they didn't exist).
+2025-12-31 04:38:57.831 | INFO     | src.app.main:on_startup:44 - Database tables created (if they didn't exist).
+2025-12-31 04:39:02.554 | INFO     | src.app.main:on_startup:44 - Database tables created (if they didn't exist).
+2025-12-31 04:39:25.316 | INFO     | src.app.main:on_startup:44 - Database tables created (if they didn't exist).
+2025-12-31 04:44:05.062 | INFO     | src.app.main:on_startup:44 - Database tables created (if they didn't exist).

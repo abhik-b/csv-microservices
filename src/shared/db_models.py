@@ -27,5 +27,7 @@ class Task(Base):
     result_path = Column(String, nullable=True)
     error_message = Column(Text, nullable=True)
 
+    celery_task_id = Column(String, nullable=True)
+
     def __repr__(self):
         return f"<Task(id={self.id}, filename={self.filename}, status={self.status})"

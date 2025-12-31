@@ -14,7 +14,18 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
+  # NEW: Redis Broker Service
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   web:
     build: .
     depends_on:
@@ -22,6 +33,8 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql://postgres:admin@db:5432/csv_processin
+      CELERY_BROKER_URL: redis://redis:6379/0  # Use 'redis' service name
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
       PYTHONPATH: /app
       WATCHFILES_FORCE_POLLING: "true" 
     ports:
@@ -52,7 +65,28 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s  # Grace period for the app to start up
-      
+  # NEW: Celery Worker Service
+  worker:
+    build: .
+    # Important: Point to your celery_app instance
+    command: celery -A src.worker.celery_app worker --loglevel=info
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:admin@db:5432/csv_processin
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      PYTHONPATH: /app
+    volumes:
+      # Sharing these ensures the worker can find files saved by 'web'
+      - ./uploads:/app/uploads
+      - ./output:/app/output
+      - ./src:/app/src
+      - ./logs:/app/logs    
 volumes:
   postgres_data:
+  redis_data:
   

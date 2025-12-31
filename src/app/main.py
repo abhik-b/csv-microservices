@@ -10,10 +10,12 @@ from datetime import datetime
 from src.app.models import ConfigSchema
 from src.shared.db_models import Task, Base
 from src.app.database import get_db, engine
-from src.app.csv_processor import csv_processing
+# from src.app.csv_processor import csv_processing
+from src.worker.tasks import process_csv_task
 import pandas as pd
 from fastapi.responses import FileResponse
 from loguru import logger
+from celery.result import AsyncResult
 import sys
 from pathlib import Path
 
@@ -115,10 +117,44 @@ def all_tasks(request: Request, db: Session = Depends(get_db)):
 def get_task_page(task_id: str, request: Request, db: Session = Depends(get_db)):
     task = db.query(Task).filter(
         Task.id == task_id).order_by(Task.created_at).first()
-    df = pd.read_csv(task.file_path)
-    logger.info("csv read successfully")
-    preview_html = df.head().to_html(classes='table table-striped', index=False)
-    return templates.TemplateResponse('task.html', {"request": request, "task": task, "preview_html": preview_html})
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    # Read CSV for preview (only if file exists and not too large)
+    preview_html = ""
+    if task.file_path and os.path.exists(task.file_path):
+        try:
+            df = pd.read_csv(task.file_path, nrows=5)  # Only read first 5 rows
+            preview_html = df.to_html(
+                classes='table table-striped', index=False)
+            logger.info("CSV preview generated successfully")
+        except Exception as e:
+            logger.warning(f"Could not generate preview: {str(e)}")
+            preview_html = "<p>Preview not available</p>"
+
+    # Get Celery task status if task is queued or processing
+    celery_status = None
+    if task.status in ["queued", "processing"]:
+        # Try to find the Celery task ID
+        # You might want to store Celery task ID in your Task model
+        # For now, we'll try to find it by task_id pattern
+        try:
+            # This is a simplified approach - you might need to adjust
+            from src.worker.tasks import process_csv_task
+            # We need a way to map task_id to Celery task ID
+            # Let's add Celery task ID to Task model later
+        except:
+            pass
+
+    return templates.TemplateResponse(
+        'task.html',
+        {
+            "request": request,
+            "task": task,
+            "preview_html": preview_html,
+            "celery_status": celery_status
+        }
+    )
 
 
 @app.get("/task/{task_id}")
@@ -161,7 +197,13 @@ async def create_task(
     db.commit()
     logger.info(f"Task  created successfully;  Task ID: {task_id}")
 
-    return {"message": "CSV File uploaded", "taskID": task_id}
+    return {
+        "message": "CSV File uploaded successfully",
+        "taskID": task_id,
+        "status": "pending",
+        "next_step": f"Add configuration at PUT /task/{task_id}",
+        "config_url": f"/task/{task_id}"
+    }
 
 
 @app.put("/task/{task_id}")
@@ -174,16 +216,43 @@ async def task_configuration(task_id: str,
         Task.id == task_id).order_by(Task.created_at).first()
 
     task.config = config.model_dump()
+    task.status = "queued"
     logger.info(f"Config for Task {task_id} updated successfully")
     db.commit()
     db.refresh(task)
-    return jsonable_encoder(task)
+
+    try:
+        # Send task to queue - this happens asynchronously
+        result = process_csv_task.delay(task_id)
+        task.celery_task_id = result.id
+        db.commit()
+        logger.info(
+            f"Task {task_id} queued. Celery Task ID: {result.id}")
+
+        return {
+            "task": jsonable_encoder(task),
+            "message": "Configuration saved and task queued for processing",
+            "celery_task_id": result.id,
+            "status_url": f"/task/status/{result.id}",
+            "progress_url": f"/tasks/{task_id}/progress"
+        }
+
+    except Exception as e:
+        logger.error(f"Failed to queue task {task_id}: {str(e)}")
+        # Rollback status
+        task.status = "pending"
+        db.commit()
+
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to queue task: {str(e)}"
+        )
 
 
-@app.get("/processing")
-def get_pending_tasks(db: Session = Depends(get_db)):
-    task = csv_processing(db)
-    return {'task processed': task.id, 'download_link': task.result_path}
+# @app.get("/processing")
+# def get_pending_tasks(db: Session = Depends(get_db)):
+#     task = csv_processing(db)
+#     return {'task processed': task.id, 'download_link': task.result_path}
 
 
 @app.get("/tasks/{task_id}/download")
@@ -195,3 +264,69 @@ def download_task_result(task_id: str, db: Session = Depends(get_db)):
         media_type="text/csv",
         filename=os.path.basename(task.result_path),
     )
+
+
+@app.get("/tasks/{task_id}/progress")
+def get_task_progress(task_id: str, db: Session = Depends(get_db)):
+    """
+    Get real-time progress of a task
+    """
+    # 1. Get task from database
+    task = db.query(Task).filter(Task.id == task_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    # 2. Build response with basic task info
+    response = {
+        "task_id": task_id,
+        "status": task.status,
+        "progress": task.progress or 0,
+        "started_at": task.started_at.isoformat() if task.started_at else None,
+        "completed_at": task.completed_at.isoformat() if task.completed_at else None,
+        "result_path": task.result_path,
+        "error_message": task.error_message,
+        "celery_task_id": task.celery_task_id,
+    }
+
+    # 3. If task has Celery task ID, get detailed status from Celery
+    if task.celery_task_id and task.status in ["queued", "processing"]:
+        try:
+            from src.worker.celery_app import celery_app
+            task_result = AsyncResult(task.celery_task_id, app=celery_app)
+
+            response["celery_state"] = task_result.state
+            response["celery_ready"] = task_result.ready()
+
+            if task_result.state == 'PROGRESS':
+                # Get progress info from Celery
+                progress_info = task_result.info or {}
+                response.update({
+                    "celery_progress": progress_info.get('current', 0),
+                    "celery_total": progress_info.get('total', 100),
+                    "celery_status": progress_info.get('status', ''),
+                    "current_operation": progress_info.get('operation', ''),
+                    "current_step": progress_info.get('current_step', 0),
+                    "total_steps": progress_info.get('total_steps', 0),
+                    "operation_params": progress_info.get('params', '')
+                })
+
+                # Update progress from Celery if available
+                if 'current' in progress_info:
+                    response["progress"] = progress_info['current']
+
+            elif task_result.ready():
+                response["celery_result"] = task_result.result
+
+        except Exception as e:
+            logger.warning(f"Could not get Celery status: {str(e)}")
+            response["celery_error"] = str(e)
+
+    # 4. Update database progress from Celery if needed
+    if task.status == "processing" and 'celery_progress' in response:
+        # Sync Celery progress to database
+        celery_progress = response.get('celery_progress')
+        if celery_progress and celery_progress != task.progress:
+            task.progress = celery_progress
+            db.commit()
+
+    return response

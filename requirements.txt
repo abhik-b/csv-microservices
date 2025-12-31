@@ -10,3 +10,6 @@ pytest==7.4.3
 pytest-asyncio==0.21.1
 python-dotenv==1.0.0
 loguru==0.7.3
+redis
+celery[redis]
+flower==2.0.1

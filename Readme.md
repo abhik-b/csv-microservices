@@ -61,11 +61,6 @@
 - add docker compose yaml ✅
 - docker compose working ✅
 
-### Logs & healthchecks
-
-- Healthcheck ✅
-<!-- - Loguru ✅ -->
-
 ```bash
 docker compose up --watch
 docker compose down
@@ -73,13 +68,30 @@ docker compose down
 docker exec -it csv-micro-db-1 psql -U postgres -d csv_processin -c "SELECT * FROM tasks LIMIT 5;"
 ```
 
-### Celery
+### Logs & healthchecks
+
+- Healthcheck ✅
+- Loguru ✅
+
+### Redis & Celery
+
+- add then to requriements.txt ✅
+- initialize the celery app ✅
+- plan new way for csv processing to get triggered ✅
+- decorate the csv processing with celery task ✅
 
 ## Phase 3
 
 - polish the project
 - prepare for interview
 - prepare a actual readme
+- update the user of the status of the task
+
+### API
+
+### UI
+
+- user cant see the config form after the processing begins
 
 ### Polishing
 
