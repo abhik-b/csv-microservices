@@ -252,15 +252,12 @@ let currentStatus = '{{task.status}}';
 
 // ========== PROGRESS POLLING FUNCTIONS ==========
 function startProgressPolling() {
-    // Clear any existing polling
     if (pollingInterval) {
         clearInterval(pollingInterval);
     }
     
-    // Start polling every 1.5 seconds (adjust as needed)
     pollingInterval = setInterval(fetchTaskProgress, 1500);
     
-    // Do an immediate fetch
     fetchTaskProgress();
 }
 
@@ -281,11 +278,9 @@ async function fetchTaskProgress() {
         const data = await response.json();
         updateTaskUI(data);
         
-        // Stop polling if task is completed or failed
         if (data.status === 'completed' || data.status === 'failed') {
             stopProgressPolling();
             
-            // If completed, show download button after a short delay
             if (data.status === 'completed') {
                 setTimeout(() => {
                     updateActionButtons(data);
@@ -294,12 +289,10 @@ async function fetchTaskProgress() {
         }
     } catch (error) {
         console.error('Error fetching progress:', error);
-        // Don't stop polling on transient errors
     }
 }
 
 function updateTaskUI(data) {
-    // Update status badge
     const statusBadge = document.getElementById('status-badge');
     statusBadge.textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
     statusBadge.className = `status-badge status-${data.status}`;
@@ -310,19 +303,12 @@ function updateTaskUI(data) {
     progressBar.style.width = `${progress}%`;
     progressBar.textContent = `${progress}%`;
     
-    // Update progress text
     document.getElementById('progress-text').textContent = `${progress}%`;
     
-    // Update times
     updateTimestamps(data);
-    
-    // Update status messages
     updateStatusMessages(data);
-    
-    // Update real-time operation details
     updateOperationDetails(data);
     
-    // Add/remove processing animation
     if (data.status === 'processing') {
         statusBadge.classList.add('processing-pulse');
         document.getElementById('real-time-updates').classList.remove('hidden');
@@ -331,14 +317,12 @@ function updateTaskUI(data) {
         document.getElementById('real-time-updates').classList.add('hidden');
     }
     
-    // Hide config form if not pending
     if (data.status !== 'pending') {
         document.getElementById('config-form').classList.add('hidden');
     }
 }
 
 function updateTimestamps(data) {
-    // Update started time
     if (data.started_at) {
         const startedTime = new Date(data.started_at);
         const istStartedTime = new Date(startedTime.getTime() + (5.5 * 60 * 60 * 1000));
@@ -346,7 +330,6 @@ function updateTimestamps(data) {
             istStartedTime.toLocaleTimeString('en-IN', {hour12: false});
     }
     
-    // Update completed time
     if (data.completed_at) {
         const completedTime = new Date(data.completed_at);
         const istCompletedTime = new Date(completedTime.getTime() + (5.5 * 60 * 60 * 1000));
@@ -492,13 +475,10 @@ if (form) {
                 const result = await response.json();
                 console.log('Task queued:', result);
                 
-                // Hide configuration form
                 document.getElementById('config-form').classList.add('hidden');
                 
-                // Start polling for progress
                 startProgressPolling();
                 
-                // Show success notification
                 showNotification('Task configuration saved and queued for processing!', 'success');
             } else {
                 const error = await response.json();
@@ -508,7 +488,6 @@ if (form) {
             console.error('Error:', error);
             showNotification(`Failed to save configuration: ${error.message}`, 'error');
             
-            // Restore button state
             submitBtn.textContent = originalText;
             submitBtn.disabled = false;
             submitBtn.className = originalBg;
@@ -518,7 +497,6 @@ if (form) {
 
 // ========== HELPER FUNCTIONS ==========
 function showNotification(message, type = 'info') {
-    // Create notification element
     const notification = document.createElement('div');
     notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
         type === 'success' ? 'bg-green-600 text-white' : 
@@ -544,12 +522,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Auto-refresh page if task is completed (optional)
-    if (currentStatus === 'completed') {
-        setTimeout(() => {
+    //if (currentStatus === 'completed') {
+    //    setTimeout(() => {
             // Refresh to show download button
-            window.location.reload();
-        }, 1000);
-    }
+    //        window.location.reload();
+    //    }, 1000);
+    //}
 });
 </script>
 </body>

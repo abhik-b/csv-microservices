@@ -9,7 +9,66 @@ from loguru import logger
 # Import your existing modules
 from src.app.database import get_db
 from src.shared.db_models import Task
-from src.app.csv_processor import OP_REGISTRY
+# from src.app.csv_processor import OP_REGISTRY
+
+import sys
+
+logger.add(
+    sys.stderr, format="{time:MMMM D, YYYY > HH:mm:ss} • {level} • {message}")
+
+
+def remove_duplicates(df, params):
+    subset = params.get("subset")
+    keep = params.get("keep", "first")
+    print("subset ", subset)
+    print("keep ", keep)
+    df = df.drop_duplicates(subset=subset, keep=keep)
+    logger.info("removed duplicates")
+    return df
+
+
+def remove_missing_rows(df, params):
+    subset = params.get("subset")
+    how = params.get("how", "any")
+    df = df.dropna(subset=subset, how=how)
+    logger.info("removed rows with missing values")
+    return df
+
+
+def drop_columns(df, params):
+    columns = params.get("columns")
+    print("columns ", columns)
+
+    if columns:
+        for i in range(len(columns)):
+            columns[i] = columns[i].strip()
+        df = df.drop(
+            columns=[c for c in columns if c in df.columns], errors="ignore")
+    logger.info("dropped columns")
+    return df
+
+
+def fill_missing(df, params):
+    if params.get("method") == "constant":
+        cols_map = params.get("columns", {})
+        for col, val in cols_map.items():
+            if col in df.columns:
+                df[col] = df[col].fillna(val)
+    elif params.get("method") == "mean":
+        for col in params.get("columns", []):
+            if col in df.columns:
+                df[col] = df[col].fillna(df[col].mean())
+    return df
+
+
+# ----- registry -----
+OP_REGISTRY = {
+    "remove_duplicates": remove_duplicates,
+    "remove_missing_rows": remove_missing_rows,
+    "drop_columns": drop_columns,
+    "fill_missing": fill_missing,
+    # add more later...
+}
 
 
 @celery_app.task(

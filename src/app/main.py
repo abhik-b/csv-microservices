@@ -18,12 +18,22 @@ from loguru import logger
 from celery.result import AsyncResult
 import sys
 from pathlib import Path
+from contextlib import asynccontextmanager
 
 from fastapi.encoders import jsonable_encoder
-# PROJECT_ROOT = Path(__file__).resolve().parents[0]
-# LOG_DIR = PROJECT_ROOT / "logs"
 
-app = FastAPI(title="Projo 1")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup logic: Runs before the app starts taking requests
+    Base.metadata.create_all(bind=engine)
+    logger.info("App started 🚀")
+    yield
+    # Shutdown logic: Runs when the app is stopping
+    # (e.g., close DB connections)
+
+
+app = FastAPI(title="Projo 1", lifespan=lifespan)
 templates = Jinja2Templates(directory='templates')
 logger.remove()
 logger.add(
@@ -36,13 +46,6 @@ logger.add(
     level="DEBUG",
     enqueue=True
 )
-
-
-@app.on_event("startup")
-def on_startup():
-    # Creates all tables if they don't exist
-    Base.metadata.create_all(bind=engine)
-    logger.info("Database tables created (if they didn't exist).")
 
 
 @app.get("/health")

@@ -22,3 +22,43 @@
 2025-12-31 04:39:02.554 | INFO     | src.app.main:on_startup:44 - Database tables created (if they didn't exist).
 2025-12-31 04:39:25.316 | INFO     | src.app.main:on_startup:44 - Database tables created (if they didn't exist).
 2025-12-31 04:44:05.062 | INFO     | src.app.main:on_startup:44 - Database tables created (if they didn't exist).
+2025-12-31 05:36:08.996 | INFO     | src.app.main:on_startup:45 - Database tables created (if they didn't exist).
+2025-12-31 05:37:24.876 | INFO     | src.app.main:create_task:181 - File Uploaded successfully : uploads/a7ffe824-1925-4af6-a182-489104b0490f.csv
+2025-12-31 05:37:24.888 | INFO     | src.app.main:create_task:198 - Task  created successfully;  Task ID: a7ffe824-1925-4af6-a182-489104b0490f
+2025-12-31 05:37:26.919 | INFO     | src.app.main:get_task_page:130 - CSV preview generated successfully
+2025-12-31 05:38:36.169 | INFO     | src.app.main:task_configuration:220 - Config for Task a7ffe824-1925-4af6-a182-489104b0490f updated successfully
+2025-12-31 05:38:36.242 | INFO     | src.app.main:task_configuration:229 - Task a7ffe824-1925-4af6-a182-489104b0490f queued. Celery Task ID: 297405e7-1915-4fec-b3b7-d2d4f26c086b
+2025-12-31 05:39:05.040 | INFO     | src.app.main:download_task_result:261 - download called
+2025-12-31 05:40:25.479 | INFO     | src.app.main:create_task:181 - File Uploaded successfully : uploads/1c3b85c0-c9f2-44af-b685-741b1639e51e.csv
+2025-12-31 05:40:25.551 | INFO     | src.app.main:create_task:198 - Task  created successfully;  Task ID: 1c3b85c0-c9f2-44af-b685-741b1639e51e
+2025-12-31 05:40:30.122 | INFO     | src.app.main:get_task_page:130 - CSV preview generated successfully
+2025-12-31 05:41:35.128 | INFO     | src.app.main:task_configuration:220 - Config for Task 1c3b85c0-c9f2-44af-b685-741b1639e51e updated successfully
+2025-12-31 05:41:35.136 | INFO     | src.app.main:task_configuration:229 - Task 1c3b85c0-c9f2-44af-b685-741b1639e51e queued. Celery Task ID: ffdda13d-b4ee-43fa-8d1a-2f29ace0aa14
+2026-01-01 05:30:33.396 | INFO     | src.app.main:lifespan:30 - App started 🚀
+2026-01-01 05:31:42.858 | INFO     | src.app.main:create_task:184 - File Uploaded successfully : uploads/dccb6345-6415-436e-a17a-667766ac9cfe.csv
+2026-01-01 05:31:42.932 | INFO     | src.app.main:create_task:201 - Task  created successfully;  Task ID: dccb6345-6415-436e-a17a-667766ac9cfe
+2026-01-01 05:31:47.195 | INFO     | src.app.main:get_task_page:133 - CSV preview generated successfully
+2026-01-01 05:32:08.841 | INFO     | src.app.main:create_task:184 - File Uploaded successfully : uploads/c8379ce7-6e42-459e-b397-9c4fbc36375b.csv
+2026-01-01 05:32:08.910 | INFO     | src.app.main:create_task:201 - Task  created successfully;  Task ID: c8379ce7-6e42-459e-b397-9c4fbc36375b
+2026-01-01 05:32:13.119 | INFO     | src.app.main:get_task_page:133 - CSV preview generated successfully
+2026-01-01 05:33:09.324 | INFO     | src.app.main:task_configuration:223 - Config for Task c8379ce7-6e42-459e-b397-9c4fbc36375b updated successfully
+2026-01-01 05:33:09.421 | INFO     | src.app.main:task_configuration:232 - Task c8379ce7-6e42-459e-b397-9c4fbc36375b queued. Celery Task ID: 4ee1ff53-5455-4d3f-8b67-6c1c7f3de414
+2026-01-01 05:33:11.493 | INFO     | src.app.main:task_configuration:223 - Config for Task dccb6345-6415-436e-a17a-667766ac9cfe updated successfully
+2026-01-01 05:33:11.501 | INFO     | src.app.main:task_configuration:232 - Task dccb6345-6415-436e-a17a-667766ac9cfe queued. Celery Task ID: 1f52eb98-0567-4660-bca5-5fdaebf0a08a
+2026-01-01 05:35:39.256 | INFO     | src.app.main:get_task_page:133 - CSV preview generated successfully
+2026-01-01 05:35:47.169 | INFO     | src.app.main:get_task_page:133 - CSV preview generated successfully
+2026-01-01 05:35:53.905 | INFO     | src.app.main:get_task_page:133 - CSV preview generated successfully
+2026-01-01 05:36:00.909 | INFO     | src.app.main:get_task_page:133 - CSV preview generated successfully
+2026-01-01 05:36:07.937 | INFO     | src.app.main:get_task_page:133 - CSV preview generated successfully
+2026-01-01 05:36:14.999 | INFO     | src.app.main:get_task_page:133 - CSV preview generated successfully
+2026-01-01 05:36:45.994 | INFO     | src.app.main:get_task_page:133 - CSV preview generated successfully
+2026-01-01 05:36:53.520 | INFO     | src.app.main:get_task_page:133 - CSV preview generated successfully
+2026-01-01 05:38:16.029 | INFO     | src.app.main:get_task_page:133 - CSV preview generated successfully
+2026-01-01 05:38:23.700 | INFO     | src.app.main:get_task_page:133 - CSV preview generated successfully
+2026-01-01 05:38:30.371 | INFO     | src.app.main:get_task_page:133 - CSV preview generated successfully
+2026-01-01 05:38:36.911 | INFO     | src.app.main:get_task_page:133 - CSV preview generated successfully
+2026-01-01 05:38:43.949 | INFO     | src.app.main:get_task_page:133 - CSV preview generated successfully
+2026-01-01 05:42:32.332 | INFO     | src.app.main:lifespan:30 - App started 🚀
+2026-01-01 05:42:43.967 | INFO     | src.app.main:get_task_page:133 - CSV preview generated successfully
+2026-01-01 05:42:55.210 | INFO     | src.app.main:download_task_result:264 - download called
+2026-01-01 05:43:14.513 | INFO     | src.app.main:get_task_page:133 - CSV preview generated successfully
