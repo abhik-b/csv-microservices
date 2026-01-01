@@ -9,18 +9,9 @@
         body { font-family: Arial, sans-serif; margin: 40px; }
     </style>
 </head>
-<body>
-    <h1>Admin</h1>
-    <!-- <div class="upload-form">
-        <form>
-            <div>
-                <label for="file">Select CSV File:</label>
-                <input type="file" id="file" name="file" accept=".csv" required>
-            </div>
-            <button type="submit">Upload </button>
-        <form>
-    </div> -->
-    <div class="flex gap-4">
+<body class="bg-gray-800 text-white">
+    <h1 class="text-5xl">CSV Microservices Admin</h1>
+    <div class="flex gap-4 mt-4">
         <p onclick="loadTasks('/tasks?=pending')">Pending</p>
         <p onclick="loadTasks('/tasks?=processing')">Processing</p>
         <p onclick="loadTasks('/tasks?=completed')">Completed</p>
@@ -29,7 +20,18 @@
     </div>
    
         <ul id="tasksContainer">
-
+            {% for task in tasks %}
+            <li class="flex flex-col w-full  leading-1.5 p-4 bg-neutral-secondary-soft rounded-e-base rounded-es-base my-4">
+                <div class="flex items-center justify-between
+                            space-x-1.5 rtl:space-x-reverse w-full">
+                    <a href="/tasks/{{task.id}}" class="text-md font-semibold text-heading mb-4">{{task.filename}}</a>
+                    <span class="text-md text-body">{{task.status}}</span>
+                </div>
+                <p class="text-sm text-body">Uploaded at : {{task.created_at}}</p>
+                <p class="text-sm text-body">Started Processing at : {{task.started_at}}</p>
+                <p class="text-sm text-body"> Completed Processing at : {{task.completed_at}}</p>
+            </li>
+            {% endfor %}
         </ul>
     </div>
 
@@ -49,7 +51,7 @@ async function loadTasks(url) {
                 <div class="flex flex-col w-full  leading-1.5 p-4 bg-neutral-secondary-soft rounded-e-base rounded-es-base my-4">
                         <div class="flex items-center justify-between
                                     space-x-1.5 rtl:space-x-reverse w-full">
-                            <span class="text-md font-semibold text-heading mb-4">${task.filename}</span>
+                            <a href="/tasks/${task.id}" class="text-md font-semibold text-heading mb-4">${task.filename}</a>
                             <span class="text-md text-body">${task.status}</span>
                         </div>
                         <p class="text-sm text-body">Uploaded at : ${task.created_at}</p>
@@ -63,6 +65,8 @@ async function loadTasks(url) {
         console.error('Failed to load tasks:', error);
     }
 }
+
+
 
 </script>
 

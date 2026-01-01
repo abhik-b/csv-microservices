@@ -1,26 +1,24 @@
 from fastapi import FastAPI, Form, File, UploadFile, Request, Depends, HTTPException
+from fastapi.responses import FileResponse
+from fastapi.encoders import jsonable_encoder
 from fastapi.templating import Jinja2Templates
-from typing import Optional
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 import uuid
 import os
 import shutil
-from sqlalchemy import text
-from datetime import datetime
-from src.app.models import ConfigSchema
-from src.shared.db_models import Task, Base
-from src.app.database import get_db, engine
-# from src.app.csv_processor import csv_processing
-from src.worker.tasks import process_csv_task
 import pandas as pd
-from fastapi.responses import FileResponse
+import sys
+from datetime import datetime
 from loguru import logger
 from celery.result import AsyncResult
-import sys
 from pathlib import Path
 from contextlib import asynccontextmanager
+from shared.schemas import ConfigSchema
+from shared.db_models import Task, Base
+from src.database import get_db, engine
+from worker.src.tasks import process_csv_task
 
-from fastapi.encoders import jsonable_encoder
 
 
 @asynccontextmanager
@@ -58,22 +56,17 @@ def health_check(db: Session = Depends(get_db)):
         "checks": {}
     }
 
-    # 1. Check Database Connection
     try:
-        # Use text() for SQLAlchemy 2.0+ compatibility
         db.execute(text("SELECT 1"))
         health_status["checks"]["database"] = "up"
     except Exception as e:
         health_status["status"] = "unhealthy"
         health_status["checks"]["database"] = f"down: {str(e)}"
 
-    # 2. Check Disk Space for Uploads
     uploads_dir = "uploads"
     if os.path.exists(uploads_dir):
-        # returns named tuple: total, used, free (in bytes)
         usage = shutil.disk_usage(uploads_dir)
 
-        # Convert bytes to Gigabytes for readability
         gb_factor = 1024**3
         health_status["checks"]["disk_space"] = {
             "total_gb": round(usage.total / gb_factor, 2),
@@ -82,7 +75,6 @@ def health_check(db: Session = Depends(get_db)):
             "percent_used": round((usage.used / usage.total) * 100, 2)
         }
 
-        # Optional: Set status to unhealthy if disk is > 95% full
         if (usage.used / usage.total) > 0.95:
             health_status["status"] = "degraded"
     else:
@@ -94,6 +86,7 @@ def health_check(db: Session = Depends(get_db)):
     return health_status
 
 
+# =====================PAGES===================
 @app.get("/admin")
 def admin(request: Request, db: Session = Depends(get_db)):
     tasks = db.query(Task).order_by(Task.created_at.desc()).all()
@@ -101,33 +94,20 @@ def admin(request: Request, db: Session = Depends(get_db)):
 
 
 @app.get("/")
-def home(request: Request, db: Session = Depends(get_db)):
-
+def homepage(request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse('home.html', {"request": request})
 
-
-@app.get("/tasks")
-def all_tasks(request: Request, db: Session = Depends(get_db)):
-    status_filter = request.query_params.get("")
-    query = db.query(Task)
-    if status_filter and status_filter in ["processing", "completed", "cancelled", "pending", "failed"]:
-        query = query.filter(Task.status == status_filter)
-    tasks = query.order_by(Task.created_at.desc()).all()
-    return tasks
-
-
 @app.get("/tasks/{task_id}")
-def get_task_page(task_id: str, request: Request, db: Session = Depends(get_db)):
+def get_taskpage(task_id: str, request: Request, db: Session = Depends(get_db)):
     task = db.query(Task).filter(
         Task.id == task_id).order_by(Task.created_at).first()
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
 
-    # Read CSV for preview (only if file exists and not too large)
     preview_html = ""
     if task.file_path and os.path.exists(task.file_path):
         try:
-            df = pd.read_csv(task.file_path, nrows=5)  # Only read first 5 rows
+            df = pd.read_csv(task.file_path, nrows=5) 
             preview_html = df.to_html(
                 classes='table table-striped', index=False)
             logger.info("CSV preview generated successfully")
@@ -135,19 +115,7 @@ def get_task_page(task_id: str, request: Request, db: Session = Depends(get_db))
             logger.warning(f"Could not generate preview: {str(e)}")
             preview_html = "<p>Preview not available</p>"
 
-    # Get Celery task status if task is queued or processing
     celery_status = None
-    if task.status in ["queued", "processing"]:
-        # Try to find the Celery task ID
-        # You might want to store Celery task ID in your Task model
-        # For now, we'll try to find it by task_id pattern
-        try:
-            # This is a simplified approach - you might need to adjust
-            from src.worker.tasks import process_csv_task
-            # We need a way to map task_id to Celery task ID
-            # Let's add Celery task ID to Task model later
-        except:
-            pass
 
     return templates.TemplateResponse(
         'task.html',
@@ -158,6 +126,17 @@ def get_task_page(task_id: str, request: Request, db: Session = Depends(get_db))
             "celery_status": celery_status
         }
     )
+
+# =====================API ENDPOINTS===================
+
+@app.get("/tasks")
+def all_tasks(request: Request, db: Session = Depends(get_db)):
+    status_filter = request.query_params.get("")
+    query = db.query(Task)
+    if status_filter and status_filter in ["processing", "completed", "cancelled", "pending", "failed"]:
+        query = query.filter(Task.status == status_filter)
+    tasks = query.order_by(Task.created_at.desc()).all()
+    return tasks
 
 
 @app.get("/task/{task_id}")
@@ -214,7 +193,6 @@ async def task_configuration(task_id: str,
                              config: ConfigSchema,
                              db: Session = Depends(get_db)
                              ):
-    print(config)
     task = db.query(Task).filter(
         Task.id == task_id).order_by(Task.created_at).first()
 
@@ -225,7 +203,6 @@ async def task_configuration(task_id: str,
     db.refresh(task)
 
     try:
-        # Send task to queue - this happens asynchronously
         result = process_csv_task.delay(task_id)
         task.celery_task_id = result.id
         db.commit()
@@ -242,7 +219,6 @@ async def task_configuration(task_id: str,
 
     except Exception as e:
         logger.error(f"Failed to queue task {task_id}: {str(e)}")
-        # Rollback status
         task.status = "pending"
         db.commit()
 
@@ -251,11 +227,6 @@ async def task_configuration(task_id: str,
             detail=f"Failed to queue task: {str(e)}"
         )
 
-
-# @app.get("/processing")
-# def get_pending_tasks(db: Session = Depends(get_db)):
-#     task = csv_processing(db)
-#     return {'task processed': task.id, 'download_link': task.result_path}
 
 
 @app.get("/tasks/{task_id}/download")
@@ -271,9 +242,6 @@ def download_task_result(task_id: str, db: Session = Depends(get_db)):
 
 @app.get("/tasks/{task_id}/progress")
 def get_task_progress(task_id: str, db: Session = Depends(get_db)):
-    """
-    Get real-time progress of a task
-    """
     # 1. Get task from database
     task = db.query(Task).filter(Task.id == task_id).first()
     if not task:
@@ -294,14 +262,13 @@ def get_task_progress(task_id: str, db: Session = Depends(get_db)):
     # 3. If task has Celery task ID, get detailed status from Celery
     if task.celery_task_id and task.status in ["queued", "processing"]:
         try:
-            from src.worker.celery_app import celery_app
+            from worker.src.celery_app import celery_app
             task_result = AsyncResult(task.celery_task_id, app=celery_app)
 
             response["celery_state"] = task_result.state
             response["celery_ready"] = task_result.ready()
 
             if task_result.state == 'PROGRESS':
-                # Get progress info from Celery
                 progress_info = task_result.info or {}
                 response.update({
                     "celery_progress": progress_info.get('current', 0),

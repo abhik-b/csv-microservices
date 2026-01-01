@@ -1,4 +1,4 @@
-from src.worker.celery_app import celery_app
+from worker.src.celery_app import celery_app
 from sqlalchemy.orm import Session
 from datetime import datetime
 import pandas as pd
@@ -7,8 +7,8 @@ import traceback
 from loguru import logger
 
 # Import your existing modules
-from src.app.database import get_db
-from src.shared.db_models import Task
+from api.src.database import get_db
+from shared.db_models import Task
 # from src.app.csv_processor import OP_REGISTRY
 
 import sys

@@ -2,8 +2,8 @@ services:
   db:
     image: postgres:15-alpine
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: csv_processin
     ports:
       - "5433:5432"
@@ -26,13 +26,13 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-  web:
-    build: .
+  api:
+    build: ./api
     depends_on:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://postgres:admin@db:5432/csv_processin
+      DATABASE_URL: ${DATABASE_URL}
       CELERY_BROKER_URL: redis://redis:6379/0  # Use 'redis' service name
       CELERY_RESULT_BACKEND: redis://redis:6379/0
       PYTHONPATH: /app
@@ -43,21 +43,23 @@ services:
       # These MUST exist as folders on your computer for persistence to work
       - ./uploads:/app/uploads
       - ./output:/app/output
-      - ./src:/app/src
-      - ./templates:/app/templates
+      - ./api/src:/app/api/src
+      - ./api/templates:/app/api/templates
+      - ./shared:/app/shared
+      - ./worker:/app/worker
       - ./logs:/app/logs
     develop:
       watch:
         - action: sync
-          path: ./src
-          target: /app/src
+          path: ./api/src
+          target: /app/api
         - action: sync
-          path: ./templates
-          target: /app/templates
+          path: ./api/templates
+          target: /app/api/templates
         - action: rebuild
           path: requirements.txt
     # Added --reload-dir to focus uvicorn on the right spot
-    command: uvicorn src.app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/src
+    command: uvicorn api.src.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/src
     healthcheck:
       # Docker will run this command to verify the status from the endpoint you wrote
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -67,16 +69,16 @@ services:
       start_period: 10s  # Grace period for the app to start up
   # NEW: Celery Worker Service
   worker:
-    build: .
-    # Important: Point to your celery_app instance
-    command: celery -A src.worker.celery_app worker --loglevel=info
+    build: ./worker
+    # user: "${CURRENT_UID}:${CURRENT_GID}"
+    command: celery -A worker.src.celery_app worker --loglevel=info
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://postgres:admin@db:5432/csv_processin
+      DATABASE_URL: ${DATABASE_URL}
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
       PYTHONPATH: /app
@@ -84,7 +86,9 @@ services:
       # Sharing these ensures the worker can find files saved by 'web'
       - ./uploads:/app/uploads
       - ./output:/app/output
-      - ./src:/app/src
+      - ./api/src:/app/api/src
+      - ./shared:/app/shared
+      - ./worker:/app/worker
       - ./logs:/app/logs    
 volumes:
   postgres_data:

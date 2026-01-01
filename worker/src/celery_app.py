@@ -6,7 +6,7 @@ celery_app = Celery(
     'csv_processor',
     broker=os.getenv('REDIS_URL', 'redis://localhost:6379/0'),
     backend=os.getenv('REDIS_URL', 'redis://localhost:6379/0'),
-    include=['src.worker.tasks']  # Path to tasks
+    include=['worker.src.tasks']  # Path to tasks
 )
 
 # Configuration
