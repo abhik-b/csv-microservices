@@ -9,9 +9,11 @@ Check the `.env.example` for more info.
 
 ### Step 1
 
-Then in the terminal : `docker compose up --build`
+Then in the terminal : `docker compose --build --no-cache`
 
-This will get the project up and running.
+This will get the project built
+
+Then run `docker compose up` to get the project up and running.
 
 ## Phase 1
 

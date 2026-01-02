@@ -113,3 +113,16 @@
 2026-01-01 15:20:40.100 | INFO     | api.src.main:get_taskpage:113 - CSV preview generated successfully
 2026-01-01 15:20:45.700 | INFO     | api.src.main:task_configuration:201 - Config for Task 92a04b26-de3b-45e6-9380-874783a3528b updated successfully
 2026-01-01 15:20:45.767 | INFO     | api.src.main:task_configuration:209 - Task 92a04b26-de3b-45e6-9380-874783a3528b queued. Celery Task ID: 93498d8b-d00f-458f-a4eb-ced843d6576c
+2026-01-01 15:26:05.800 | INFO     | api.src.main:lifespan:28 - App started 🚀
+2026-01-01 15:26:09.140 | INFO     | api.src.main:create_task:163 - File Uploaded successfully : uploads/811f5405-1abb-497b-8b3b-8fd3935bc905.csv
+2026-01-01 15:26:09.151 | INFO     | api.src.main:create_task:180 - Task  created successfully;  Task ID: 811f5405-1abb-497b-8b3b-8fd3935bc905
+2026-01-01 15:26:11.187 | INFO     | api.src.main:get_taskpage:113 - CSV preview generated successfully
+2026-01-01 15:26:15.726 | INFO     | api.src.main:task_configuration:201 - Config for Task 811f5405-1abb-497b-8b3b-8fd3935bc905 updated successfully
+2026-01-01 15:26:15.829 | INFO     | api.src.main:task_configuration:209 - Task 811f5405-1abb-497b-8b3b-8fd3935bc905 queued. Celery Task ID: 110cdef5-32bd-4045-9cff-f7c19c540e40
+2026-01-01 15:40:54.675 | INFO     | api.src.main:create_task:163 - File Uploaded successfully : uploads/0ed70cb4-3e10-41ec-82d4-8b76d20532f6.csv
+2026-01-01 15:40:54.687 | INFO     | api.src.main:create_task:180 - Task  created successfully;  Task ID: 0ed70cb4-3e10-41ec-82d4-8b76d20532f6
+2026-01-01 15:40:56.716 | INFO     | api.src.main:get_taskpage:113 - CSV preview generated successfully
+2026-01-01 15:42:03.104 | INFO     | api.src.main:task_configuration:201 - Config for Task 0ed70cb4-3e10-41ec-82d4-8b76d20532f6 updated successfully
+2026-01-01 15:42:03.114 | INFO     | api.src.main:task_configuration:209 - Task 0ed70cb4-3e10-41ec-82d4-8b76d20532f6 queued. Celery Task ID: 3b184087-41ef-4115-b439-a6a7ce23b14e
+2026-01-01 15:42:11.271 | INFO     | api.src.main:download_task_result:235 - download called
+2026-01-01 15:42:25.754 | INFO     | api.src.main:get_taskpage:113 - CSV preview generated successfully
