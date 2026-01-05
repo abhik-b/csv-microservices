@@ -2,10 +2,6 @@
 
 A high-performance microservices application designed for asynchronous CSV file manipulation. Built to handle heavy data processing without blocking user interaction using FastAPI, Celery, and Redis.
 
-## 📖 Overview
-
-Processing large CSV files can be time-consuming and often causes web servers to time out. This system solves that by offloading heavy data operations to background workers.
-
 ## ✅ Key Features
 
 - **Asynchronous Processing**: Files are queued in Redis and processed by dedicated Celery workers.
@@ -78,20 +74,9 @@ This will get the project built
 
 Then run `docker compose up` to get the project up and running.
 
-## 💡 What I Learned
-
-- **Microservices Orchestration** : Managing inter-service communication between API, workers, and a message broker.
-- **Docker**:
-- **Redis & Celery**:
-
 ## Acknowledgements
 
 1. Thanks to this article on ([setting up pgadmin with docker](https://www.geeksforgeeks.org/postgresql/run-postgresql-on-docker-and-setting-up-pgadmin/))
-2. this command shows the table
-
-```bash
-docker exec -it csv-micro-db-1 psql -U postgres -d csv_processin -c "SELECT * FROM tasks LIMIT 5;"
-```
 
 ---
 
