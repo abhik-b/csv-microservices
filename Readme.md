@@ -18,6 +18,21 @@ Processing large CSV files can be time-consuming and often causes web servers to
 
 [![Full Demo](./docs/demo.gif)](./docs/full-demo.mp4)
 
+**Home Page**
+![Homepage](./docs/homepage.png)
+
+**Task Details Page**
+![Task Details](./docs/task-details.png)
+
+**Task Configuration**
+![task-config](./docs/task-config.png)
+
+**Task Queued**
+![task queued](./docs/task-status-queued.png)
+
+**Task Complete Download Button**
+![task-complete-download-btn](./docs/task-complete-download-btn.png)
+
 ## 🛠 Tech Stack
 
 | Component      | Technology     | Role                                               |
