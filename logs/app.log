@@ -126,3 +126,32 @@
 2026-01-01 15:42:03.114 | INFO     | api.src.main:task_configuration:209 - Task 0ed70cb4-3e10-41ec-82d4-8b76d20532f6 queued. Celery Task ID: 3b184087-41ef-4115-b439-a6a7ce23b14e
 2026-01-01 15:42:11.271 | INFO     | api.src.main:download_task_result:235 - download called
 2026-01-01 15:42:25.754 | INFO     | api.src.main:get_taskpage:113 - CSV preview generated successfully
+2026-01-04 04:39:25.753 | INFO     | api.src.main:lifespan:29 - App started 🚀
+2026-01-04 04:41:16.880 | INFO     | api.src.main:get_taskpage:112 - CSV preview generated successfully
+2026-01-04 04:42:54.032 | INFO     | api.src.main:lifespan:29 - App started 🚀
+2026-01-04 04:43:04.713 | INFO     | api.src.main:get_taskpage:112 - CSV preview generated successfully
+2026-01-04 04:43:06.404 | INFO     | api.src.main:get_taskpage:112 - CSV preview generated successfully
+2026-01-04 04:45:17.125 | INFO     | api.src.main:lifespan:29 - App started 🚀
+2026-01-04 04:45:25.385 | INFO     | api.src.main:get_taskpage:112 - CSV preview generated successfully
+2026-01-05 04:17:55.696 | INFO     | api.src.main:lifespan:29 - App started 🚀
+2026-01-05 04:18:32.529 | INFO     | api.src.main:create_task:162 - File Uploaded successfully : uploads/85cdf305-82e8-4136-8054-68c2a667817c.csv
+2026-01-05 04:18:32.548 | INFO     | api.src.main:create_task:179 - Task  created successfully;  Task ID: 85cdf305-82e8-4136-8054-68c2a667817c
+2026-01-05 04:18:34.588 | INFO     | api.src.main:get_taskpage:112 - CSV preview generated successfully
+2026-01-05 04:22:10.024 | INFO     | api.src.main:lifespan:29 - App started 🚀
+2026-01-05 04:22:45.121 | INFO     | api.src.main:create_task:162 - File Uploaded successfully : uploads/5ef497a1-52a9-4332-9b77-a2d337dfe266.csv
+2026-01-05 04:22:45.131 | INFO     | api.src.main:create_task:179 - Task  created successfully;  Task ID: 5ef497a1-52a9-4332-9b77-a2d337dfe266
+2026-01-05 04:22:47.163 | INFO     | api.src.main:get_taskpage:112 - CSV preview generated successfully
+2026-01-05 04:25:12.415 | INFO     | api.src.main:task_configuration:200 - Config for Task 5ef497a1-52a9-4332-9b77-a2d337dfe266 updated successfully
+2026-01-05 04:25:12.535 | INFO     | api.src.main:task_configuration:208 - Task 5ef497a1-52a9-4332-9b77-a2d337dfe266 queued. Celery Task ID: 8e0c8bef-e61d-4c40-ada5-7d934f226623
+2026-01-05 04:25:35.256 | INFO     | api.src.main:download_task_result:234 - download called
+2026-01-05 04:26:21.735 | INFO     | api.src.main:get_taskpage:112 - CSV preview generated successfully
+2026-01-05 04:26:40.986 | INFO     | api.src.main:get_taskpage:112 - CSV preview generated successfully
+2026-01-05 04:27:53.402 | INFO     | api.src.main:get_taskpage:112 - CSV preview generated successfully
+2026-01-05 05:44:57.664 | INFO     | api.src.main:lifespan:29 - App started 🚀
+2026-01-05 05:45:32.773 | INFO     | api.src.main:create_task:162 - File Uploaded successfully : uploads/01c814d3-d9a1-40c2-b122-93daacf1519d.csv
+2026-01-05 05:45:32.791 | INFO     | api.src.main:create_task:179 - Task  created successfully;  Task ID: 01c814d3-d9a1-40c2-b122-93daacf1519d
+2026-01-05 05:45:34.851 | INFO     | api.src.main:get_taskpage:112 - CSV preview generated successfully
+2026-01-05 05:46:23.692 | INFO     | api.src.main:task_configuration:200 - Config for Task 01c814d3-d9a1-40c2-b122-93daacf1519d updated successfully
+2026-01-05 05:46:23.806 | INFO     | api.src.main:task_configuration:208 - Task 01c814d3-d9a1-40c2-b122-93daacf1519d queued. Celery Task ID: 17fc3806-0de3-4cd8-9e80-6b618c3254cb
+2026-01-05 05:46:31.276 | INFO     | api.src.main:download_task_result:234 - download called
+2026-01-05 05:47:12.371 | INFO     | api.src.main:get_taskpage:112 - CSV preview generated successfully

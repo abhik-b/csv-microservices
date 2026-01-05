@@ -1,19 +1,21 @@
-from fastapi import FastAPI, Form, File, UploadFile, Request, Depends, HTTPException
-from fastapi.responses import FileResponse
-from fastapi.encoders import jsonable_encoder
-from fastapi.templating import Jinja2Templates
-from sqlalchemy.orm import Session
-from sqlalchemy import text
 import uuid
 import os
 import shutil
 import pandas as pd
 import sys
 from datetime import datetime
+
+from fastapi import FastAPI, Form, File, UploadFile, Request, Depends, HTTPException
+from fastapi.responses import FileResponse
+from fastapi.encoders import jsonable_encoder
+from fastapi.templating import Jinja2Templates
+from sqlalchemy.orm import Session
+from sqlalchemy import text
 from loguru import logger
 from celery.result import AsyncResult
 from pathlib import Path
 from contextlib import asynccontextmanager
+
 from shared.schemas import ConfigSchema
 from shared.db_models import Task, Base
 from src.database import get_db, engine
@@ -23,12 +25,10 @@ from worker.src.tasks import process_csv_task
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup logic: Runs before the app starts taking requests
     Base.metadata.create_all(bind=engine)
     logger.info("App started 🚀")
     yield
-    # Shutdown logic: Runs when the app is stopping
-    # (e.g., close DB connections)
+    
 
 
 app = FastAPI(title="Projo 1", lifespan=lifespan)
@@ -87,15 +87,14 @@ def health_check(db: Session = Depends(get_db)):
 
 
 # =====================PAGES===================
+@app.get("/")
+def homepage(request: Request, db: Session = Depends(get_db)):
+    return templates.TemplateResponse('home.html', {"request": request})
+
 @app.get("/admin")
 def admin(request: Request, db: Session = Depends(get_db)):
     tasks = db.query(Task).order_by(Task.created_at.desc()).all()
     return templates.TemplateResponse('admin.html', {"request": request, "tasks": tasks})
-
-
-@app.get("/")
-def homepage(request: Request, db: Session = Depends(get_db)):
-    return templates.TemplateResponse('home.html', {"request": request})
 
 @app.get("/tasks/{task_id}")
 def get_taskpage(task_id: str, request: Request, db: Session = Depends(get_db)):

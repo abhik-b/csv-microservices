@@ -11,5 +11,5 @@ venv
 .DS_Store
 *.log
 uploads/*
-outputs/*
-test*
+output/*
+test/*

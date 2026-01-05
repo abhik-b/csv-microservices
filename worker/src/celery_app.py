@@ -1,15 +1,13 @@
 from celery import Celery
 import os
 
-# Create Celery app
 celery_app = Celery(
     'csv_processor',
     broker=os.getenv('REDIS_URL', 'redis://localhost:6379/0'),
     backend=os.getenv('REDIS_URL', 'redis://localhost:6379/0'),
-    include=['worker.src.tasks']  # Path to tasks
+    include=['worker.src.tasks'] 
 )
 
-# Configuration
 celery_app.conf.update(
     task_serializer='json',
     accept_content=['json'],
@@ -19,7 +17,7 @@ celery_app.conf.update(
 
     # Task settings
     task_track_started=True,
-    task_time_limit=30 * 60,  # 30 minutes
+    task_time_limit=30 * 60, 
     task_soft_time_limit=25 * 60,
 
     # Queue settings

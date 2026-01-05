@@ -7,6 +7,22 @@
 - `pytest.ini` : This file holds certain configuration related to `pytest`
 - `logs` : This folder holds all the logs that are outputted by loguru
 
+## Docker
+
+### Dockerfile
+
+This file acts as a "recipe" to build a Docker Image—a self-contained package that includes the OS, Python, our code, and all dependencies. It ensures that if the app runs on our machine, it will run exactly the same way in production.
+
+- `FROM python:3.11-slim`: Uses a lightweight version of Python 3.11. "Slim" images are preferred in 2026 because they reduce the attack surface by excluding unnecessary system tools.
+- `WORKDIR /app`: Creates and sets the primary directory inside the container where all following commands will run.
+- `ENV ...`.: Sets Python environment variables.
+  `PYTHONDONTWRITEBYTECODE=1` prevents Python from writing .pyc files, keeping the container clean.
+  `PYTHONUNBUFFERED=1` ensures logs are sent immediately to the terminal (crucial for Docker logs).
+- `RUN apt-get update...`: Installs essential system-level tools (like gcc for compiling some Python packages) needed for database connections like PostgreSQL.
+- `COPY requirements.txt .` then `RUN pip install...`: By copying only the requirements first, Docker can cache this layer. If you change your code but not your requirements, Docker skips the slow install process during the next build.
+- `COPY . .`: Copies the rest of your actual source code into the image.
+- `CMD [...]`: Defines the default command to start the app. It uses Uvicorn, a high-performance server required for FastAPI's asynchronous features
+
 ## FastAPI
 
 ## Redis & Celery

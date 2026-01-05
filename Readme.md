@@ -1,4 +1,42 @@
-## Getting Started
+# Scalable CSV Data Processing System
+
+A high-performance microservices application designed for asynchronous CSV file manipulation. Built to handle heavy data processing without blocking user interaction using FastAPI, Celery, and Redis.
+
+## 📖 Overview
+
+Processing large CSV files can be time-consuming and often causes web servers to time out. This system solves that by offloading heavy data operations to background workers.
+
+## ✅ Key Features
+
+- **Asynchronous Processing**: Files are queued in Redis and processed by dedicated Celery workers.
+- **Configurable Pipelines**: User-defined operations including duplicate removal, column dropping, and missing value handling.
+- **Containerized Architecture**: Fully orchestrated with Docker Compose for seamless "one-command" deployment.
+
+## 📸 Screenshots & Demos
+
+**Demo Video** (click the gif for full demo video)
+
+[![Full Demo](./docs/demo.gif)](./docs/full-demo.mp4)
+
+## 🛠 Tech Stack
+
+| Component      | Technology     | Role                                               |
+| -------------- | -------------- | -------------------------------------------------- |
+| Backend        | FastAPI        | High-performance asynchronous REST API             |
+| Database       | Postgres       | Stores the task metadata                           |
+| Task Queue     | Celery + Redis | Asynchronous task management and message brokering |
+| Data Handling  | Pandas         | Efficient CSV manipulation and transformation      |
+| Infrastructure | Docker Compose | Service orchestration and environment isolation    |
+
+## 🏗 System Architecture
+
+![alt text](./docs/sys-architecture.png)
+
+## Data Flow Diagram
+
+![](./docs/DFD.png)
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
@@ -9,113 +47,27 @@ Check the `.env.example` for more info.
 
 ### Step 1
 
+Clone the repo and start the entire stack:
+
+```bash
+git clone https://github.com/abhik-b/csv-microservices.git
+
+cd csv-microservices
+```
+
+### Step 2
+
 Then in the terminal : `docker compose --build --no-cache`
 
 This will get the project built
 
 Then run `docker compose up` to get the project up and running.
 
-## Phase 1
+## 💡 What I Learned
 
-- Build the core services ✅
-- write some tests ✅
-- make some diagrams
-
-### Service 1 Fast API Backend
-
-- 1. Fast API setup ✅
-  - a.basic structure ✅
-  - b.Jinja Templates ✅
-  - c.Upload Files ✅
-- 2. Set up Sqlite ✅
-- 3. Create Models ✅
-- 4. Task in DB ✅
-
-### Service 2 CSV Processing
-
-- Poll Postgres for tasks with status = “PENDING” ✅
-- Lock the task → Set status = “PROCESSING” ✅
-- Mark task as “COMPLETED” or “FAILED” ✅
-- Process the CSV
-  - drop duplicates ✅
-  - remove missing rows ✅
-  - drop columns ✅
-  - fill missing values ✅
-- Write results to task_results table ✅
-
-### Service 3 Frontend
-
-- Given a task_id → return task status + results ✅
-- Task configuration gets uploaded from frontend ✅
-- Build the full “frontend API” users will use later.
-  - Task id page is where the task type (config) is created ✅
-  - Tasks are displayed based on filters (admin page) ✅
-  - File Upload page & redirect to Task id page ✅
-
-### Tests
-
-- CSV Processing Logic
-
-  - duplicates are removed ✅
-  - missing rows are dropped ✅
-  - columns are dropped correctly ✅
-  - fillna works as expected ✅
-
-- Task Lifecycle Tests (DB + Logic) ✅
-
-## Phase 2
-
-- add docker ✅
-- add docker compose ✅
-- handle the processing part
-- add schedulers
-
-### Docker
-
-- prepare a dockerfile ✅
-- build docker image ✅
-- run docker image ✅
-- add docker compose yaml ✅
-- docker compose working ✅
-
-```bash
-docker compose up --watch
-docker compose down
-
-docker exec -it csv-micro-db-1 psql -U postgres -d csv_processin -c "SELECT * FROM tasks LIMIT 5;"
-```
-
-### Logs & healthchecks
-
-- Healthcheck ✅
-- Loguru ✅
-
-### Redis & Celery
-
-- add then to requriements.txt ✅
-- initialize the celery app ✅
-- plan new way for csv processing to get triggered ✅
-- decorate the csv processing with celery task ✅
-
-## Phase 3
-
-- update the user of the status of the task ✅
-- lifespan instead of on_event startup
-- datetime.utcnow replace ✅
-- proper task service
-- add loggers ✅
-- Test the API ✅
-- admin page tab style ui
-- admin page startup show all tasks
-- polish the project
-- prepare for interview
-- prepare a actual readme
-
-### API
-
-### UI
-
-- user cant see the config form after the processing begins ✅
+- **Microservices Orchestration** : Managing inter-service communication between API, workers, and a message broker.
+- **Docker**:
+- **Redis & Celery**:
 
 ## Acknowledgements
 
@@ -125,3 +77,7 @@ docker exec -it csv-micro-db-1 psql -U postgres -d csv_processin -c "SELECT * FR
 ```bash
 docker exec -it csv-micro-db-1 psql -U postgres -d csv_processin -c "SELECT * FROM tasks LIMIT 5;"
 ```
+
+---
+
+### 📬 Contact me via <a href="https://linkedin.com/in/abhikb1234" target="blank"><img    src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/linked-in-alt.svg" alt="abhikb1234" height="11" width="11" /></a> for any queries

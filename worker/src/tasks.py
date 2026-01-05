@@ -89,18 +89,14 @@ def process_csv_task(self, task_id: str):
     db: Session = next(get_db())
 
     try:
-        # 1. Get task from database
         task = db.query(Task).filter(Task.id == task_id).first()
         if not task:
             raise ValueError(f"Task {task_id} not found")
 
-        # 2. Update status to processing
         task.status = "processing"
         task.started_at = datetime.now()
         task.progress = 10
         db.commit()
-
-        # Update Celery task state
 
         # Initial progress update
         self.update_state(
@@ -116,7 +112,7 @@ def process_csv_task(self, task_id: str):
             }
         )
 
-        # 3. Process CSV (using your existing logic)
+        # Processing CSV begins
         input_path = task.file_path
         df = pd.read_csv(input_path)
 
@@ -138,7 +134,6 @@ def process_csv_task(self, task_id: str):
         # task.progress = 30
         # db.commit()
 
-        # Apply operations from config
         if task.config and isinstance(task.config, dict):
             ops = task.config.get("operations", [])
             total_ops = max(1, len(ops))
@@ -170,11 +165,11 @@ def process_csv_task(self, task_id: str):
                 df = handler(df, params)
 
                 # Update progress for each operation
-                progress = 30 + int((i + 1) / total_ops * 60)
+                # progress = 30 + int((i + 1) / total_ops * 60)
                 # task.progress = progress
                 # db.commit()
 
-        # 4. Save results
+        # Processing Ends
         self.update_state(
             state='PROGRESS',
             meta={
@@ -190,14 +185,12 @@ def process_csv_task(self, task_id: str):
         # task.progress = 90
         # db.commit()
 
-        # Create output directory if it doesn't exist
         os.makedirs('output', exist_ok=True)
 
         output_filename = f"processed_{task.original_filename}"
         output_path = os.path.join('output', output_filename)
         df.to_csv(output_path, index=False)
 
-        # 5. Update task as completed
         task.status = "completed"
         task.completed_at = datetime.now()
         task.result_path = output_path
@@ -218,14 +211,12 @@ def process_csv_task(self, task_id: str):
         logger.error(f"❌ Task {task_id} failed: {e}")
         logger.error(traceback.format_exc())
 
-        # Update task as failed
         if 'task' in locals() and task:
             task.status = "failed"
             task.error_message = f"{str(e)}\n\n{traceback.format_exc()}"
             task.completed_at = datetime.now()
             db.commit()
 
-        # Re-raise for Celery retry
         raise e
     finally:
         if 'db' in locals():

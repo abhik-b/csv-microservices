@@ -16,14 +16,14 @@ class ConfigSchema(BaseModel):
     operations: list
 
 
-class Task(BaseModel):
-    id: str
-    filename: str
-    original_filename: str
-    file_path: str
-    task_type: str
-    status: TaskStatus
-    created_at: datetime
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
-    download_link: Optional[str] = None
+# class Task(BaseModel):
+#     id: str
+#     filename: str
+#     original_filename: str
+#     file_path: str
+#     task_type: str
+#     status: TaskStatus
+#     created_at: datetime
+#     started_at: Optional[datetime] = None
+#     completed_at: Optional[datetime] = None
+#     download_link: Optional[str] = None

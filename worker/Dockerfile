@@ -1,4 +1,4 @@
-# worker-service/Dockerfile
+# worker
 FROM python:3.11-slim
 
 WORKDIR /app
